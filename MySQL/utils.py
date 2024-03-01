@@ -12,7 +12,7 @@ def conectar():
             db='pmysql',
             host='localhost',
             user='root',
-            passwd='kennyow86!'
+            passwd='xxxxx'
         )
         return conn
     except MySQLdb.Error as e:
