@@ -119,13 +119,14 @@ def menu():
     """
     Função para gerar o menu inicial
     """
-    print('\033[42m ========= PROJETO FARMÁCIA - BANCO DE DADOS - CDIA UFPB ==============\033[m')
+    print('\033[33m ========= PROJETO FARMÁCIA - BANCO DE DADOS - CDIA UFPB ==============\033[m')
     print('Selecione uma opção: ')
     print('1 - Inserir produtos.')
     print('2 - Alterar/Atualizar produtos.')
     print('3 - Pesquisar produtos.')
-    print('4 - Listar produto.')
-    print('5 - Deletar produto.')
+    print('4 - Deletar produto.')
+    print('5 - Listar produto.')
+    print('6 - Exibir produto.')
     opcao = int(input())
     if opcao in [1, 2, 3, 4]:
         if opcao == 1:
@@ -133,11 +134,13 @@ def menu():
         elif opcao == 2:
             atualizar()
         elif opcao == 3:
-            listar()
+            pesquisar()
         elif opcao == 4:
-            listar()
-        elif opcao == 5:
             deletar()
+        elif opcao == 5:
+            listar()
+        elif opcao == 6:
+            exibir()
         else:
             print('Opção inválida')
     else:
