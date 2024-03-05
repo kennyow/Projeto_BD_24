@@ -113,12 +113,49 @@ def deletar():
     else:
         print(f'Erro ao excluir o produto com id = {codigo}')
 
+def pesquisar():
+    """
+    Função para pesquisar um produto
+    """  
+    
+    conn =  conectar()
+    cursor  = conn.cursor()
+
+    nome = int(input('Informe o nome do produto: '))
+    cursor.execute(f"SELECT FROM produtos WHERE name={nome}")
+
+    conn.commit()
+
+    if cursor.rowcount == 1:
+        print(f'O produto foi exibido com sucesso')
+    else:
+        print(f'Produto {nome} não consta na base de dados')
+
     desconectar(conn)
+
+def exibir():
+    """
+    Função para exibir um produto
+    """  
+    
+    conn =  conectar()
+    cursor  = conn.cursor()
+
+    codigo = int(input('Informe o codigo do produto: '))
+    cursor.execute(f"SELECT FROM produtos WHERE id={codigo}")
+
+    conn.commit()
+
+    if cursor.rowcount == 1:
+        print(f'O produto foi excluido')
+    else:
+        print(f'Erro ao excluir o produto com id = {codigo}')
 
 def menu():
     """
     Função para gerar o menu inicial
     """
+    print()
     print('\033[33m ========= PROJETO FARMÁCIA - BANCO DE DADOS - CDIA UFPB ==============\033[m')
     print('Selecione uma opção: ')
     print('1 - Inserir produtos.')
@@ -128,7 +165,7 @@ def menu():
     print('5 - Listar produto.')
     print('6 - Exibir produto.')
     opcao = int(input())
-    if opcao in [1, 2, 3, 4]:
+    if opcao in [1, 2, 3, 4, 5, 6]:
         if opcao == 1:
             inserir()
         elif opcao == 2:
