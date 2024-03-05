@@ -53,6 +53,7 @@ def listar():
     else:
         print("Não existem medicamentos cadastrados")
     desconectar(conn)
+
 def inserir():
     """
     Função para inserir um medicamento
@@ -68,9 +69,8 @@ def inserir():
     classe = input('Informe a classe terapêutica: ')
     situacao = input('Informe a situação de registro: ')
     principio = input('Informe o principio ativo: ')
-    preco = float(input('Informe o preço: '))  # Alterado para float, caso preço contenha casas decimais
+    preco = float(input('Informe o preço: '))  
 
-    # Note que estou adicionando aspas em torno das variáveis que representam strings e datas
     cursor.execute(f"INSERT INTO medicamentos (id, nome, categoria_regulatoria, data_vencimento_registro, classe_terapeutica, situacao_registro, principio_ativo, preco) VALUES (NULL, '{nome}', '{categoria}', '{vencimento}', '{classe}', '{situacao}', '{principio}', {preco})")
     conn.commit()
 
@@ -89,12 +89,16 @@ def atualizar():
     conn =  conectar()
     cursor  = conn.cursor()
 
-    codigo = int(input('Informe o codigo do produto: '))
+    codigo = int(input('Informe o codigo do medicamento que deseja atualizar: '))
     nome = input('Novo Nome do produto: ')
-    preco = float(input(' Novo  - Informe o preço do produto: '))
-    estoque = int(input('Novo - Informe a quantidade em estoque: '))
+    categoria = input('Informe a categoria: ')
+    vencimento = input('Informe a data de vencimento (Ex: 21-12-2): ')
+    classe = input('Informe a classe terapêutica: ')
+    situacao = input('Informe a situação de registro: ')
+    principio = input('Informe o principio ativo: ')
+    preco = float(input('Informe o preço: ')) 
 
-    cursor.execute(f"UPDATE produtos SET nome='{nome}', preco={preco}, estoque={estoque} WHERE id={codigo}")
+    cursor.execute(f"UPDATE medicamentos SET nome='{nome}', categoria_regulatoria='{categoria}', data_vencimento_registro='{vencimento}', classe_terapeutica='{classe}', situacao_registro='{situacao}', principio_ativo='{principio}', preco='{preco}' WHERE id='{codigo}'")
 
     conn.commit()
 
