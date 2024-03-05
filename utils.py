@@ -9,7 +9,7 @@ def conectar():
     #print('Conectando ao servidor...')
     try:
         conn = MySQLdb.connect(
-            db='pmysql',
+            db='farmacia',
             host='localhost',
             user='root',
             passwd='kennyow86!'
@@ -35,7 +35,8 @@ def listar():
     # print('Listando produtos...')
     conn =  conectar()
     cursor  = conn.cursor()
-    cursor.execute("SELECT * FROM produtos")
+    qtde = int(input('Selecione quantos itens deseja ver: '))
+    cursor.execute(f"SELECT * FROM medicamentos LIMIT {qtde}")
     produtos = cursor.fetchall()
 
     if len(produtos) > 0:
@@ -44,11 +45,13 @@ def listar():
         for produto in produtos:
             print(f"ID: {produto[0]}")
             print(f"Produto: {produto[1]}")
-            print(f"Preço: {produto[2]}")
-            print(f"Estoque: {produto[3]}")
+            print(f"Categoria: {produto[3]}")
+            print(f"Classe Terapêutica: {produto[5]}")
+            print(f"Vencimento: {produto[4]}")
+            print(f"Valor: R$ {produto[7]}")
             print("--------------------")
     else:
-        print("Não existem produtos cadastrados")
+        print("Não existem medicamentos cadastrados")
     desconectar(conn)
 def inserir():
     """
@@ -164,6 +167,7 @@ def menu():
     print('4 - Deletar produto.')
     print('5 - Listar produto.')
     print('6 - Exibir produto.')
+
     opcao = int(input())
     if opcao in [1, 2, 3, 4, 5, 6]:
         if opcao == 1:
