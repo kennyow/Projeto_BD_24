@@ -55,18 +55,25 @@ def listar():
     desconectar(conn)
 def inserir():
     """
-    Função para inserir um produto
+    Função para inserir um medicamento
     """  
     #print('Inserindo produto...')
-    conn =  conectar()
-    cursor  = conn.cursor()
+    conn = conectar()
+    cursor = conn.cursor()
 
-    nome = input('Nome do produto: ')
-    preco = float(input('Informe o preço do produto: '))
-    estoque = int(input('Informe a quantidade em estoque: '))
+    print('CADASTRO DO MEDICAMENTO')
+    nome = input('Nome do medicamento: ')
+    categoria = input('Informe a categoria: ')
+    vencimento = input('Informe a data de vencimento (Ex: 21-12-2): ')
+    classe = input('Informe a classe terapêutica: ')
+    situacao = input('Informe a situação de registro: ')
+    principio = input('Informe o principio ativo: ')
+    preco = float(input('Informe o preço: '))  # Alterado para float, caso preço contenha casas decimais
 
-    cursor.execute(f"INSERT INTO produtos (nome, preco, estoque) VALUES ('{nome}', {preco}, {estoque})")
+    # Note que estou adicionando aspas em torno das variáveis que representam strings e datas
+    cursor.execute(f"INSERT INTO medicamentos (id, nome, categoria_regulatoria, data_vencimento_registro, classe_terapeutica, situacao_registro, principio_ativo, preco) VALUES (NULL, '{nome}', '{categoria}', '{vencimento}', '{classe}', '{situacao}', '{principio}', {preco})")
     conn.commit()
+
 
     if cursor.rowcount == 1:
         print(f'O produto {nome} foi inserido')
