@@ -117,8 +117,8 @@ def deletar():
     conn =  conectar()
     cursor  = conn.cursor()
 
-    codigo = int(input('Informe o codigo do produto: '))
-    cursor.execute(f"DELETE FROM produtos WHERE id={codigo}")
+    codigo = int(input('Informe o codigo do medicamento: '))
+    cursor.execute(f"DELETE FROM medicamentos WHERE id={codigo}")
 
     conn.commit()
 
