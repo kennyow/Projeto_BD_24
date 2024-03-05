@@ -132,11 +132,57 @@ def pesquisar():
     Função para pesquisar um produto
     """  
     
-    conn =  conectar()
-    cursor  = conn.cursor()
+    conn = conectar()
+    cursor = conn.cursor()
 
-    nome = int(input('Informe o nome do produto: '))
-    cursor.execute(f"SELECT FROM produtos WHERE name={nome}")
+    ask = int(input('Deseja realizar a pesquisa pelo (1-nome) ou (2-id): '))
+
+    if ask == 1:
+        nome = str(input('Informe o nome do medicamento: '))
+        cursor.execute(f"SELECT * FROM medicamentos WHERE nome='{nome}'")
+        produto = cursor.fetchone()
+        if produto:
+            print("--------------------")
+            print(f"Nome: {produto[1]}")
+            print("--------------------")
+            print(f"ID: {produto[0]}")
+            print(f"Categoria: {produto[2]}")
+            print(f"Vencimento: {produto[3]}")
+            print(f"Classe Terapêutica: {produto[4]}")
+            print(f"Situação: {produto[5]}")
+            print(f"Princípio Ativo: {produto[6]}")
+            print(f"Valor: R$ {produto[7]}")
+            print("--------------------")
+        else:
+            print("Medicamento não encontrado")
+    elif ask == 2:
+        aid = int(input('Informe o id do medicamento: '))
+        cursor.execute(f"SELECT * FROM medicamentos WHERE id={aid}")
+        produto = cursor.fetchone()
+        if produto:
+            print("--------------------")
+            print(f"ID: {produto[0]}")
+            print("--------------------")
+            print(f"Nome: {produto[1]}")
+            print(f"Categoria: {produto[2]}")
+            print(f"Vencimento: {produto[3]}")
+            print(f"Classe Terapêutica: {produto[4]}")
+            print(f"Situação: {produto[5]}")
+            print(f"Princípio Ativo: {produto[6]}")
+            print(f"Valor: R$ {produto[7]}")
+            print("--------------------")
+        else:
+            print("Medicamento não encontrado")
+    else:
+        print("Opção inválida")
+
+    # Verifica se a consulta retornou algum resultado
+    results = cursor.fetchall()
+    '''if results:
+        for row in results:
+            print(row)
+    else:
+        print("Nenhum resultado encontrado.")'''
 
     conn.commit()
 
