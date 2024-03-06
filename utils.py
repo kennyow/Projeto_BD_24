@@ -195,21 +195,63 @@ def pesquisar():
 
 def exibir():
     """
-    Função para exibir um produto
+    Função para exibir relatório
     """  
     
-    conn =  conectar()
-    cursor  = conn.cursor()
+    conn = conectar()
+    cursor = conn.cursor()
 
-    codigo = int(input('Informe o codigo do produto: '))
-    cursor.execute(f"SELECT FROM produtos WHERE id={codigo}")
+    print('RELATÓRIO MEDICAMENTOS')
+    print('------------------------------------------')
+
+    
+    cursor.execute("SELECT COUNT(nome) AS QtdeMed FROM medicamentos;")
+    result = cursor.fetchone()
+    print("Quantidade de Medicamentos:", result[0])
+    print('------------------------------------------')
+
+    print('Quantidade por Categoria Regulatória')
+    print('------------------------------------------')
+    cursor.execute("SELECT DISTINCT(categoria_regulatoria) AS Categoria, COUNT(categoria_regulatoria) AS Quantidade FROM medicamentos GROUP BY Categoria ORDER BY Quantidade DESC;")
+    results = cursor.fetchall()
+    for row in results:
+        print(row)
+    print('------------------------------------------')
+    print('Data do Vencimento perto do dia de hoje (10 mais próximos)')
+    print('------------------------------------------')
+    cursor.execute("SELECT nome as MEDICAMENTO, data_vencimento_registro AS Data_vencimento, DATEDIFF(curdate(), data_vencimento_registro) AS PRAZO, situacao_registro AS Situação FROM medicamentos WHERE DATEDIFF(curdate(), data_vencimento_registro) < 0 ORDER BY data_vencimento_registro ASC LIMIT 10;")
+    results = cursor.fetchall()
+    for row in results:
+        print(row)
+    print('------------------------------------------')
+    print('Quantitativo de Situação de Registro')
+    print('------------------------------------------')
+    cursor.execute("SELECT DISTINCT(situacao_registro) AS Situação, COUNT(situacao_registro) AS Quantidade FROM medicamentos GROUP BY Situação ORDER BY Quantidade DESC;")
+    results = cursor.fetchall()
+    for row in results:
+        print(row)
+    print('------------------------------------------')
+    print('Remédios de menor valor e sua categoria')
+    print('------------------------------------------')
+    cursor.execute("SELECT nome as NOME, categoria_regulatoria AS CATEGORIA, preco as PREÇO FROM medicamentos WHERE preco = (SELECT MIN(preco) FROM medicamentos) ORDER BY nome;")
+    results = cursor.fetchall()
+    for row in results:
+        print(row)
+    print('------------------------------------------')
+    print('Remédios de maior valor e sua categoria')
+    print('------------------------------------------')
+    cursor.execute("SELECT nome as NOME, categoria_regulatoria AS CATEGORIA, preco as PREÇO FROM medicamentos WHERE preco = (SELECT MAX(preco) FROM medicamentos) ORDER BY nome;")
+    results = cursor.fetchall()
+    for row in results:
+        print(row)
 
     conn.commit()
 
     if cursor.rowcount == 1:
-        print(f'O produto foi excluido')
+        print(f'Relatório Exibido com sucesso')
     else:
-        print(f'Erro ao excluir o produto com id = {codigo}')
+        print(f'Erro ao reportar o Relatório')
+
 
 def menu():
     """
@@ -223,7 +265,7 @@ def menu():
     print('3 - Pesquisar produtos.')
     print('4 - Deletar produto.')
     print('5 - Listar produto.')
-    print('6 - Exibir produto.')
+    print('6 - Exibir relatório.')
 
     opcao = int(input())
     if opcao in [1, 2, 3, 4, 5, 6]:
