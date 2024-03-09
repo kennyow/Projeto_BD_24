@@ -54,6 +54,28 @@ def listar():
         print("Não existem medicamentos cadastrados")
     desconectar(conn)
 
+def get_medicine_list():
+
+    conn =  conectar()
+    cursor  = conn.cursor()
+
+    cursor.execute(f"SELECT * FROM medicamentos")
+    produtos = cursor.fetchall()
+
+    medicine_list = []
+    for produto in produtos:
+        medicine_list.append({})
+        medicine_list[-1]['id'] = produto[0]
+        medicine_list[-1]['product'] = produto[1]
+        medicine_list[-1]['category'] = produto[3]
+        medicine_list[-1]['therapeutic_class'] = produto[5]
+        medicine_list[-1]['date'] = produto[4]
+        medicine_list[-1]['price'] = produto[7]
+
+    desconectar(conn)
+
+    return medicine_list
+
 def inserir():
     """
     Função para inserir um medicamento
@@ -258,7 +280,7 @@ def menu():
     Função para gerar o menu inicial
     """
     print()
-    print('\033[33m ========= PROJETO FARMÁCIA - BANCO DE DADOS - CDIA UFPB ==============\033[m')
+    print('\033[33m ========= PROJETO FARMÝCIA - BANCO DE DADOS - CDIA UFPB ==============\033[m')
     print('Selecione uma opção: ')
     print('1 - Inserir produtos.')
     print('2 - Alterar/Atualizar produtos.')
