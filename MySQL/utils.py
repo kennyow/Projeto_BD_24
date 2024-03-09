@@ -67,9 +67,11 @@ def get_medicine_list():
         medicine_list.append({})
         medicine_list[-1]['id'] = produto[0]
         medicine_list[-1]['product'] = produto[1]
-        medicine_list[-1]['category'] = produto[3]
-        medicine_list[-1]['therapeutic_class'] = produto[5]
-        medicine_list[-1]['date'] = produto[4]
+        medicine_list[-1]['category'] = produto[2]
+        medicine_list[-1]['limit_date'] = produto[3]
+        medicine_list[-1]['therapeutic_class'] = produto[4]
+        medicine_list[-1]['status'] = produto[5]
+        medicine_list[-1]['active'] = produto[6]
         medicine_list[-1]['price'] = produto[7]
 
     desconectar(conn)
