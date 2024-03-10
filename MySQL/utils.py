@@ -1,7 +1,5 @@
 import MySQLdb
 
-
-
 def conectar():
     """
     Função para conectar ao servidor
@@ -25,34 +23,6 @@ def desconectar(conn):
     #print('Desconectando do servidor...')
     if conn:
         conn.close()
-
-
-def listar():
-    """
-    Função para listar os produtos
-    """
-    #
-    # print('Listando produtos...')
-    conn =  conectar()
-    cursor  = conn.cursor()
-    qtde = int(input('Selecione quantos itens deseja ver: '))
-    cursor.execute(f"SELECT * FROM medicamentos LIMIT {qtde}")
-    produtos = cursor.fetchall()
-
-    if len(produtos) > 0:
-        print("Listando Produtos")
-        print("--------------------")
-        for produto in produtos:
-            print(f"ID: {produto[0]}")
-            print(f"Produto: {produto[1]}")
-            print(f"Categoria: {produto[3]}")
-            print(f"Classe Terapêutica: {produto[5]}")
-            print(f"Vencimento: {produto[4]}")
-            print(f"Valor: R$ {produto[7]}")
-            print("--------------------")
-    else:
-        print("Não existem medicamentos cadastrados")
-    desconectar(conn)
 
 def get_medicine_list():
 
@@ -78,78 +48,39 @@ def get_medicine_list():
 
     return medicine_list
 
-def inserir():
-    """
-    Função para inserir um medicamento
-    """  
-    #print('Inserindo produto...')
+def insert_product(nome, categoria, vencimento, classe, situacao, principio, preco):
     conn = conectar()
     cursor = conn.cursor()
 
-    print('CADASTRO DO MEDICAMENTO')
-    nome = input('Nome do medicamento: ')
-    categoria = input('Informe a categoria: ')
-    vencimento = input('Informe a data de vencimento (Ex: 21-12-2): ')
-    classe = input('Informe a classe terapêutica: ')
-    situacao = input('Informe a situação de registro: ')
-    principio = input('Informe o principio ativo: ')
-    preco = float(input('Informe o preço: '))  
-
-    cursor.execute(f"INSERT INTO medicamentos (id, nome, categoria_regulatoria, data_vencimento_registro, classe_terapeutica, situacao_registro, principio_ativo, preco) VALUES (NULL, '{nome}', '{categoria}', '{vencimento}', '{classe}', '{situacao}', '{principio}', {preco})")
+    cursor.execute(f"INSERT INTO medicamentos (id, nome, categoria_regulatoria, data_vencimento_registro, classe_terapeutica, situacao_registro, principio_ativo, preco) VALUES (NULL, '{nome}', '{categoria}', '{vencimento}', '{classe}', '{situacao}', '{principio}', {float(preco)})")
     conn.commit()
-
-
-    if cursor.rowcount == 1:
-        print(f'O produto {nome} foi inserido')
-    else:
-        print(f'Não foi possivel inserir')
-
-    desconectar(conn)
-def atualizar():
-    """
-    Função para atualizar um produto
-    """
-    #print('Atualizando produto...')
-    conn =  conectar()
-    cursor  = conn.cursor()
-
-    codigo = int(input('Informe o codigo do medicamento que deseja atualizar: '))
-    nome = input('Novo Nome do produto: ')
-    categoria = input('Informe a categoria: ')
-    vencimento = input('Informe a data de vencimento (Ex: 21-12-2): ')
-    classe = input('Informe a classe terapêutica: ')
-    situacao = input('Informe a situação de registro: ')
-    principio = input('Informe o principio ativo: ')
-    preco = float(input('Informe o preço: ')) 
-
-    cursor.execute(f"UPDATE medicamentos SET nome='{nome}', categoria_regulatoria='{categoria}', data_vencimento_registro='{vencimento}', classe_terapeutica='{classe}', situacao_registro='{situacao}', principio_ativo='{principio}', preco='{preco}' WHERE id='{codigo}'")
-
-    conn.commit()
-
-    if cursor.rowcount == 1:
-        print(f'O produto {nome} foi atualizado')
-    else:
-        print(f'Não foi possivel atualizar')
 
     desconectar(conn)
 
-def deletar():
-    """
-    Função para deletar um produto
-    """  
-    #print('Deletando produto...')
+def update_product(id, nome, categoria, vencimento, classe, situacao, principio, preco):
     conn =  conectar()
     cursor  = conn.cursor()
 
-    codigo = int(input('Informe o codigo do medicamento: '))
-    cursor.execute(f"DELETE FROM medicamentos WHERE id={codigo}")
+    cursor.execute(f"UPDATE medicamentos SET nome='{nome}', categoria_regulatoria='{categoria}', data_vencimento_registro='{vencimento}', classe_terapeutica='{classe}', situacao_registro='{situacao}', principio_ativo='{principio}', preco='{ float(preco) }' WHERE id='{id}'")
 
     conn.commit()
 
+    desconectar(conn)
+
+def delete_product(id):
+    conn =  conectar()
+    cursor  = conn.cursor()
+
+    cursor.execute(f"DELETE FROM medicamentos WHERE id={id}")
+
+    conn.commit()
+
+    desconectar(conn)
+
     if cursor.rowcount == 1:
-        print(f'O produto foi excluido')
-    else:
-        print(f'Erro ao excluir o produto com id = {codigo}')
+        return True
+
+    return False
 
 def pesquisar():
     """
@@ -275,37 +206,3 @@ def exibir():
         print(f'Relatório Exibido com sucesso')
     else:
         print(f'Erro ao reportar o Relatório')
-
-
-def menu():
-    """
-    Função para gerar o menu inicial
-    """
-    print()
-    print('\033[33m ========= PROJETO FARMÝCIA - BANCO DE DADOS - CDIA UFPB ==============\033[m')
-    print('Selecione uma opção: ')
-    print('1 - Inserir produtos.')
-    print('2 - Alterar/Atualizar produtos.')
-    print('3 - Pesquisar produtos.')
-    print('4 - Deletar produto.')
-    print('5 - Listar produto.')
-    print('6 - Exibir relatório.')
-
-    opcao = int(input())
-    if opcao in [1, 2, 3, 4, 5, 6]:
-        if opcao == 1:
-            inserir()
-        elif opcao == 2:
-            atualizar()
-        elif opcao == 3:
-            pesquisar()
-        elif opcao == 4:
-            deletar()
-        elif opcao == 5:
-            listar()
-        elif opcao == 6:
-            exibir()
-        else:
-            print('Opção inválida')
-    else:
-        print('Opção inválida')

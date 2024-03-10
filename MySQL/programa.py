@@ -13,9 +13,15 @@ class StoreUI(Tk):
         self.title(title)
 
         self.sidebar_entries_size = 0
+        self.current_product = -1
 
     def main(self):
         self.mainloop()
+
+    def delete(self):
+        if self.current_product != -1:
+            delete_product(self.current_product)
+            self.reset_list()
 
     def add_sidebar_entry(self, name):
         div = Frame(self.sidebar)
@@ -49,6 +55,12 @@ class StoreUI(Tk):
         self.product_active =         self.add_sidebar_entry("Principio ativo")
         self.product_price =                    self.add_sidebar_entry("Valor")
 
+        savebtn = Button(self.sidebar, text="Salvar", width=8, command=lambda: print("a"))
+        savebtn.grid(row=self.sidebar_entries_size+2, column=0, padx=(10, 10))
+
+        deletebtn = Button(self.sidebar, text="Excluir", width=8, command=lambda: self.delete())
+        deletebtn.grid(row=self.sidebar_entries_size+3, column=0, padx=(10, 10))
+
     def set_entry_value(self, component, value):
         component.delete(0, END)
         component.insert(0, value) 
@@ -68,6 +80,8 @@ class StoreUI(Tk):
         self.set_entry_value(self.product_status,                 ui.med_list[selection]['status']) 
         self.set_entry_value(self.product_active,                 ui.med_list[selection]['active']) 
         self.set_entry_value(self.product_price,                   ui.med_list[selection]['price']) 
+
+        self.current_product = selection
 
     def search_list(self):
         query = self.search_text.get()
@@ -103,6 +117,8 @@ class StoreUI(Tk):
 
         for item in self.med_list.values():
             self.parenttree.insert('', END, text=item['product'], iid=item['id'], open=False)
+
+        self.current_product = -1
 
 
 if __name__ == '__main__':
