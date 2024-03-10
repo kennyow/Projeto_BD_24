@@ -69,13 +69,76 @@ class StoreUI(Tk):
         self.set_entry_value(self.product_active,                 ui.med_list[selection]['active']) 
         self.set_entry_value(self.product_price,                   ui.med_list[selection]['price']) 
 
+    def search_list(self):
+        query = self.search_text.get()
+
+        for item in self.parenttree.get_children():
+            self.parenttree.delete(item)
+
+        initial_list = get_medicine_list()
+        keys = [item['id'] for item in initial_list]
+        self.med_list = dict(zip(keys, initial_list)) 
+
+        for item in self.med_list.values():
+            if query in item['product'].lower():
+                self.parenttree.insert('', END, text=item['product'], iid=item['id'], open=False)
+
+    def reset_list(self):
+        self.search_text.set("")
+
+        self.set_entry_value(self.product_name,        "") 
+        self.set_entry_value(self.product_category,    "") 
+        self.set_entry_value(self.product_class,       "") 
+        self.set_entry_value(self.product_limit_date,  "") 
+        self.set_entry_value(self.product_status,      "") 
+        self.set_entry_value(self.product_active,      "") 
+        self.set_entry_value(self.product_price,       "") 
+
+        for item in self.parenttree.get_children():
+            self.parenttree.delete(item)
+
+        initial_list = get_medicine_list()
+        keys = [item['id'] for item in initial_list]
+        self.med_list = dict(zip(keys, initial_list)) 
+
+        for item in self.med_list.values():
+            self.parenttree.insert('', END, text=item['product'], iid=item['id'], open=False)
+
 
 if __name__ == '__main__':
     ui = StoreUI("Farmacia", 800, 600, 150, 150)
 
     ui.rowconfigure(0, weight=1)
     ui.columnconfigure(0, weight=1)
-    ui.parenttree = ttk.Treeview(ui)
+
+    box_div = Frame(ui)
+    box_div.rowconfigure(0, weight=1)
+    box_div.columnconfigure(0, weight=1)
+    box_div.grid(row=0, column=0, sticky='new')
+
+    div = Frame(box_div)
+    div.rowconfigure(0, weight=1)
+    div.columnconfigure(0, weight=1)
+    div.grid(row=0, column=0, sticky='n', pady=(10, 10))
+
+    ui.search_text = StringVar()
+    ui.searchbox = Entry(div, width=35, textvariable=ui.search_text)
+    ui.searchbox.grid(row=0, column=0)
+
+    ui.searchbox.bind('<Return>', lambda x: ui.search_list())
+
+    searchbtn = Button(div, text="Pesquisar", width=8, command=lambda: ui.search_list())
+    searchbtn.grid(row=0, column=1, padx=(10, 5))
+
+    searchbtn = Button(div, text="Limpar", width=8, command=lambda: ui.reset_list())
+    searchbtn.grid(row=0, column=2, padx=(5, 10))
+
+    tree_div = Frame(box_div)
+    tree_div.rowconfigure(0, weight=1)
+    tree_div.columnconfigure(0, weight=1)
+    tree_div.grid(row=1, column=0, sticky='nsew')
+
+    ui.parenttree = ttk.Treeview(tree_div, height=26)
     ui.parenttree.heading("#0", text="Medicamentos")
 
     initial_list = get_medicine_list()
