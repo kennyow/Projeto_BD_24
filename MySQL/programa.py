@@ -13,17 +13,30 @@ class StoreUI(Tk):
         self.title(title)
 
         self.sidebar_entries_size = 0
-        self.current_product = -1
+        self.curr_prod = -1
 
     def main(self):
         self.mainloop()
 
     def delete(self):
-        if self.current_product != -1:
-            delete_product(self.current_product)
+        if self.curr_prod != -1:
+            delete_product(self.curr_prod)
             self.reset_list()
 
-    def add_sidebar_entry(self, name):
+    def update(self):
+        if self.curr_prod != -1:
+            name = self.prod_name_v.get()
+            category = self.prod_category_v.get()
+            limit_date = self.prod_limit_date_v.get()
+            t_class = self.prod_class_v.get()
+            status = self.prod_status_v.get()
+            active = self.prod_active_v.get()
+            price = self.prod_price_v.get()
+
+            update_product(self.curr_prod, name, category, limit_date, t_class, status, active, price)
+            self.reset_list()
+
+    def add_sidebar_entry(self, name, strvar):
         div = Frame(self.sidebar)
         div.rowconfigure(0, weight=1)
         div.columnconfigure(0, weight=1)
@@ -32,7 +45,7 @@ class StoreUI(Tk):
         label = Label(div, text=f"{name}:", width=15, anchor='w')
         label.grid(row=0, column=0)
 
-        entry = Entry(div, width=35)
+        entry = Entry(div, width=35, textvariable=strvar)
         entry.grid(row=0, column=1)
 
         self.sidebar_entries_size += 1
@@ -47,15 +60,23 @@ class StoreUI(Tk):
         label = Label(self.sidebar, text="Descricao", width=22, relief=GROOVE).grid(row=0, column=0, sticky='n')
         padding = Label(self.sidebar, text="", width=40).grid(sticky='s')
 
-        self.product_name =                      self.add_sidebar_entry("Nome")
-        self.product_category =             self.add_sidebar_entry("Categoria")
-        self.product_class =       self.add_sidebar_entry("Classe terapeutica")
-        self.product_limit_date =          self.add_sidebar_entry("Vencimento")
-        self.product_status =                self.add_sidebar_entry("Situacao")
-        self.product_active =         self.add_sidebar_entry("Principio ativo")
-        self.product_price =                    self.add_sidebar_entry("Valor")
+        self.prod_name_v =       StringVar()
+        self.prod_category_v =   StringVar()
+        self.prod_class_v =      StringVar()
+        self.prod_limit_date_v = StringVar()
+        self.prod_status_v =     StringVar()
+        self.prod_active_v =     StringVar()
+        self.prod_price_v =      StringVar()
 
-        savebtn = Button(self.sidebar, text="Salvar", width=8, command=lambda: print("a"))
+        self.product_name =                      self.add_sidebar_entry("Nome", self.prod_name_v)
+        self.product_category =         self.add_sidebar_entry("Categoria", self.prod_category_v)
+        self.product_class =      self.add_sidebar_entry("Classe terapeutica", self.prod_class_v)
+        self.product_limit_date =    self.add_sidebar_entry("Vencimento", self.prod_limit_date_v)
+        self.product_status =              self.add_sidebar_entry("Situacao", self.prod_status_v)
+        self.product_active =       self.add_sidebar_entry("Principio ativo", self.prod_active_v)
+        self.product_price =                   self.add_sidebar_entry("Valor", self.prod_price_v)
+
+        savebtn = Button(self.sidebar, text="Salvar", width=8, command=lambda: self.update())
         savebtn.grid(row=self.sidebar_entries_size+2, column=0, padx=(10, 10))
 
         deletebtn = Button(self.sidebar, text="Excluir", width=8, command=lambda: self.delete())
@@ -81,7 +102,7 @@ class StoreUI(Tk):
         self.set_entry_value(self.product_active,                 ui.med_list[selection]['active']) 
         self.set_entry_value(self.product_price,                   ui.med_list[selection]['price']) 
 
-        self.current_product = selection
+        self.curr_prod = selection
 
     def search_list(self):
         query = self.search_text.get()
@@ -118,7 +139,7 @@ class StoreUI(Tk):
         for item in self.med_list.values():
             self.parenttree.insert('', END, text=item['product'], iid=item['id'], open=False)
 
-        self.current_product = -1
+        self.curr_prod = -1
 
 
 if __name__ == '__main__':
@@ -171,4 +192,3 @@ if __name__ == '__main__':
 
     ui.main()
 
-   #menu()
