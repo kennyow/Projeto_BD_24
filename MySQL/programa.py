@@ -18,11 +18,6 @@ class StoreUI(Tk):
     def main(self):
         self.mainloop()
 
-    def delete(self):
-        if self.curr_prod != -1:
-            delete_product(self.curr_prod)
-            self.reset_list()
-
     def update(self):
         if self.curr_prod != -1:
             name = self.prod_name_v.get()
@@ -34,6 +29,11 @@ class StoreUI(Tk):
             price = self.prod_price_v.get()
 
             update_product(self.curr_prod, name, category, limit_date, t_class, status, active, price)
+            self.reset_list()
+
+    def delete(self):
+        if self.curr_prod != -1:
+            delete_product(self.curr_prod)
             self.reset_list()
 
     def add_sidebar_entry(self, name, strvar):
@@ -57,8 +57,8 @@ class StoreUI(Tk):
         self.sidebar.rowconfigure(0, weight=1)
         self.sidebar.columnconfigure(1, weight=1)
         self.sidebar.grid(row=0, column=1, sticky='n', padx=(10, 10))
-        label = Label(self.sidebar, text="Descricao", width=22, relief=GROOVE).grid(row=0, column=0, sticky='n')
-        padding = Label(self.sidebar, text="", width=40).grid(sticky='s')
+        label = Label(self.sidebar, text="Dados do produto", width=22, relief=GROOVE)
+        label.grid(row=0, column=0, sticky='n', pady=(12, 12))
 
         self.prod_name_v =       StringVar()
         self.prod_category_v =   StringVar()
@@ -186,7 +186,8 @@ if __name__ == '__main__':
         ui.parenttree.insert('', END, text=item['product'], iid=item['id'], open=False)
 
     ui.parenttree.grid(row=0, column=0, sticky='nsew')
-    ui.parenttree.bind("<Button-1>", lambda x: ui.select_product())
+    ui.parenttree.bind("<Double-Button-1>", lambda x: ui.select_product())
+    ui.parenttree.bind("<Return>", lambda x: ui.select_product())
 
     ui.setup_sidebar()
 
