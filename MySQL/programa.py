@@ -13,20 +13,93 @@ class StoreUI(Tk):
         self.title(title)
 
         self.sidebar_entries_size = 0
+        self.dialog_entries_size = 0
         self.curr_prod = -1
 
     def main(self):
         self.mainloop()
 
+    def add_dialog_entry(self, name, strvar):
+        div = Frame(self.dialog_div)
+        div.rowconfigure(0, weight=1)
+        div.columnconfigure(0, weight=1)
+        div.grid(row=self.dialog_entries_size+2, column=0, sticky='n')
+
+        label = Label(div, text=f"{name}:", width=15, anchor='w')
+        label.grid(row=0, column=0)
+
+        entry = Entry(div, width=35, textvariable=strvar)
+        entry.grid(row=0, column=1)
+
+        self.dialog_entries_size += 1
+
+        return entry
+    
+    def create(self):
+        self.dialog.destroy()
+        self.dialog.update()
+
+        name =             self.new_prod_name.get()
+        category =     self.new_prod_category.get()
+        limit_date = self.new_prod_limit_date.get()
+        t_class =         self.new_prod_class.get()
+        status =         self.new_prod_status.get()
+        active =         self.new_prod_active.get()
+        price =           self.new_prod_price.get()
+
+        insert_product(name, category, limit_date, t_class, status, active, price)
+
+        self.reset_list()
+
+    def create_dialog(self):
+        self.dialog = Toplevel(self)
+        self.dialog.title("Cadastrar produto")
+
+        w = 400
+        h = 300
+        x = 300
+        y = 200
+
+        self.dialog.geometry("%dx%d+%d+%d" % (w, h, x, y))
+
+        self.dialog.rowconfigure(0, weight=1)
+        self.dialog.columnconfigure(0, weight=1)
+
+        self.dialog_div = Frame(self.dialog)
+        self.dialog_div.rowconfigure(0, weight=1)
+        self.dialog_div.columnconfigure(0, weight=1)
+        self.dialog_div.grid(row=0, column=0, sticky='new', pady=(20, 20))
+
+        self.new_prod_name =       StringVar()
+        self.new_prod_category =   StringVar()
+        self.new_prod_class =      StringVar()
+        self.new_prod_limit_date = StringVar()
+        self.new_prod_status =     StringVar()
+        self.new_prod_active =     StringVar()
+        self.new_prod_price =      StringVar()
+
+        product_name =                      self.add_dialog_entry("Nome", self.new_prod_name)
+        product_category =         self.add_dialog_entry("Categoria", self.new_prod_category)
+        product_class =      self.add_dialog_entry("Classe terapeutica", self.new_prod_class)
+        product_limit_date =    self.add_dialog_entry("Vencimento", self.new_prod_limit_date)
+        product_status =              self.add_dialog_entry("Situacao", self.new_prod_status)
+        product_active =       self.add_dialog_entry("Principio ativo", self.new_prod_active)
+        product_price =                   self.add_dialog_entry("Valor", self.new_prod_price)
+
+        newbtn = Button(self.dialog, text="Salvar", width=8, command=lambda: self.create())
+        newbtn.grid(row=self.dialog_entries_size+2, column=0, pady=(10, 10))
+
+        self.dialog.bind("<Return>", lambda x: self.create())
+
     def update(self):
         if self.curr_prod != -1:
-            name = self.prod_name_v.get()
-            category = self.prod_category_v.get()
+            name =             self.prod_name_v.get()
+            category =     self.prod_category_v.get()
             limit_date = self.prod_limit_date_v.get()
-            t_class = self.prod_class_v.get()
-            status = self.prod_status_v.get()
-            active = self.prod_active_v.get()
-            price = self.prod_price_v.get()
+            t_class =         self.prod_class_v.get()
+            status =         self.prod_status_v.get()
+            active =         self.prod_active_v.get()
+            price =           self.prod_price_v.get()
 
             update_product(self.curr_prod, name, category, limit_date, t_class, status, active, price)
             self.reset_list()
@@ -76,11 +149,16 @@ class StoreUI(Tk):
         self.product_active =       self.add_sidebar_entry("Principio ativo", self.prod_active_v)
         self.product_price =                   self.add_sidebar_entry("Valor", self.prod_price_v)
 
-        savebtn = Button(self.sidebar, text="Salvar", width=8, command=lambda: self.update())
-        savebtn.grid(row=self.sidebar_entries_size+2, column=0, padx=(10, 10))
+        buttons_div = Frame(self.sidebar)
+        buttons_div.rowconfigure(0, weight=1)
+        buttons_div.columnconfigure(1, weight=1)
+        buttons_div.grid(row=self.sidebar_entries_size+2, column=0, sticky='n', pady=(10, 10))
 
-        deletebtn = Button(self.sidebar, text="Excluir", width=8, command=lambda: self.delete())
-        deletebtn.grid(row=self.sidebar_entries_size+3, column=0, padx=(10, 10))
+        savebtn = Button(buttons_div, text="Salvar", width=8, command=lambda: self.update())
+        savebtn.grid(row=0, column=0, padx=(10, 5))
+
+        deletebtn = Button(buttons_div, text="Excluir", width=8, command=lambda: self.delete())
+        deletebtn.grid(row=0, column=1, padx=(5, 10))
 
     def set_entry_value(self, component, value):
         component.delete(0, END)
@@ -115,7 +193,7 @@ class StoreUI(Tk):
         self.med_list = dict(zip(keys, initial_list)) 
 
         for item in self.med_list.values():
-            if query in item['product'].lower():
+            if query.lower() in item['product'].lower():
                 self.parenttree.insert('', END, text=item['product'], iid=item['id'], open=False)
 
     def reset_list(self):
@@ -158,17 +236,23 @@ if __name__ == '__main__':
     div.columnconfigure(0, weight=1)
     div.grid(row=0, column=0, sticky='n', pady=(10, 10))
 
+    newbtn = Button(div, text="Novo", width=8, command=lambda: ui.create_dialog())
+    newbtn.grid(row=0, column=0, padx=(10, 5))
+
+    separator = ttk.Separator(div, orient='vertical')
+    separator.grid(row=0, column=1, sticky='ns', padx=(5, 10))
+
     ui.search_text = StringVar()
     ui.searchbox = Entry(div, width=35, textvariable=ui.search_text)
-    ui.searchbox.grid(row=0, column=0)
+    ui.searchbox.grid(row=0, column=2)
 
     ui.searchbox.bind('<Return>', lambda x: ui.search_list())
 
     searchbtn = Button(div, text="Pesquisar", width=8, command=lambda: ui.search_list())
-    searchbtn.grid(row=0, column=1, padx=(10, 5))
+    searchbtn.grid(row=0, column=3, padx=(10, 5))
 
     searchbtn = Button(div, text="Limpar", width=8, command=lambda: ui.reset_list())
-    searchbtn.grid(row=0, column=2, padx=(5, 10))
+    searchbtn.grid(row=0, column=4, padx=(5, 10))
 
     tree_div = Frame(box_div)
     tree_div.rowconfigure(0, weight=1)
@@ -187,7 +271,7 @@ if __name__ == '__main__':
 
     ui.parenttree.grid(row=0, column=0, sticky='nsew')
     ui.parenttree.bind("<Double-Button-1>", lambda x: ui.select_product())
-    ui.parenttree.bind("<Return>", lambda x: ui.select_product())
+    ui.parenttree.bind("<Return>",          lambda x: ui.select_product())
 
     ui.setup_sidebar()
 
