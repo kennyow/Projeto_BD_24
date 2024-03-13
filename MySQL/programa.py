@@ -19,6 +19,35 @@ class StoreUI(Tk):
     def main(self):
         self.mainloop()
 
+    def log_dialog(self):
+        self.l_dialog = Toplevel(self)
+        self.l_dialog.title("Relatorio de produtos")
+
+        w = 600
+        h = 500
+        x = 300
+        y = 200
+
+        self.l_dialog.geometry("%dx%d+%d+%d" % (w, h, x, y))
+
+        self.l_dialog.rowconfigure(0, weight=1)
+        self.l_dialog.columnconfigure(0, weight=1)
+
+        self.l_dialog = Frame(self.l_dialog)
+        self.l_dialog.rowconfigure(0, weight=1)
+        self.l_dialog.columnconfigure(0, weight=1)
+        self.l_dialog.grid(row=0, column=0, sticky='new', pady=(20, 20))
+
+        textbox = Text(self.l_dialog)
+        textbox.grid(row=0, column=0, padx=(10, 10), sticky='nsew')
+
+        textbox.insert(END, log_products())
+
+        newbtn = Button(self.l_dialog, text="Salvar", width=8, command=lambda: self.create())
+        newbtn.grid(row=self.dialog_entries_size+2, column=0, pady=(10, 10))
+
+        self.l_dialog.bind("<Return>", lambda x: self.create())
+
     def add_dialog_entry(self, name, strvar):
         div = Frame(self.dialog_div)
         div.rowconfigure(0, weight=1)
@@ -160,6 +189,12 @@ class StoreUI(Tk):
         deletebtn = Button(buttons_div, text="Excluir", width=8, command=lambda: self.delete())
         deletebtn.grid(row=0, column=1, padx=(5, 10))
 
+        separator = ttk.Separator(self.sidebar, orient='horizontal')
+        separator.grid(row=self.sidebar_entries_size+3, column=0, sticky='ew', pady=(10, 10))
+
+        logbtn = Button(self.sidebar, text="Relatorio", width=8, command=lambda: self.log_dialog())
+        logbtn.grid(row=self.sidebar_entries_size+4, column=0)
+
     def set_entry_value(self, component, value):
         component.delete(0, END)
         component.insert(0, value) 
@@ -251,8 +286,8 @@ if __name__ == '__main__':
     searchbtn = Button(div, text="Pesquisar", width=8, command=lambda: ui.search_list())
     searchbtn.grid(row=0, column=3, padx=(10, 5))
 
-    searchbtn = Button(div, text="Limpar", width=8, command=lambda: ui.reset_list())
-    searchbtn.grid(row=0, column=4, padx=(5, 10))
+    clearbtn = Button(div, text="Limpar", width=8, command=lambda: ui.reset_list())
+    clearbtn.grid(row=0, column=4, padx=(5, 10))
 
     tree_div = Frame(box_div)
     tree_div.rowconfigure(0, weight=1)

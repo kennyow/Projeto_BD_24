@@ -148,61 +148,59 @@ def pesquisar():
 
     desconectar(conn)
 
-def exibir():
-    """
-    Função para exibir relatório
-    """  
-    
+def log_products():
     conn = conectar()
     cursor = conn.cursor()
 
-    print('RELATÓRIO MEDICAMENTOS')
-    print('------------------------------------------')
+    log = ""
+
+    log += 'RELATÓRIO MEDICAMENTOS\n'
+    log += '------------------------------------------\n'
 
     
     cursor.execute("SELECT COUNT(nome) AS QtdeMed FROM medicamentos;")
     result = cursor.fetchone()
-    print("Quantidade de Medicamentos:", result[0])
-    print('------------------------------------------')
+    log += f"Quantidade de Medicamentos: {result[0]}\n"
+    log += '------------------------------------------\n'
 
-    print('Quantidade por Categoria Regulatória')
-    print('------------------------------------------')
+    log += 'Quantidade por Categoria Regulatória\n'
+    log += '------------------------------------------\n'
     cursor.execute("SELECT DISTINCT(categoria_regulatoria) AS Categoria, COUNT(categoria_regulatoria) AS Quantidade FROM medicamentos GROUP BY Categoria ORDER BY Quantidade DESC;")
     results = cursor.fetchall()
     for row in results:
-        print(row)
-    print('------------------------------------------')
-    print('Data do Vencimento perto do dia de hoje (10 mais próximos)')
-    print('------------------------------------------')
+        log += str(row) + "\n"
+    log += '------------------------------------------\n'
+    log += 'Data do Vencimento perto do dia de hoje (10 mais próximos)\n'
+    log += '------------------------------------------\n'
     cursor.execute("SELECT nome as MEDICAMENTO, data_vencimento_registro AS Data_vencimento, DATEDIFF(curdate(), data_vencimento_registro) AS PRAZO, situacao_registro AS Situação FROM medicamentos WHERE DATEDIFF(curdate(), data_vencimento_registro) < 0 ORDER BY data_vencimento_registro ASC LIMIT 10;")
     results = cursor.fetchall()
     for row in results:
-        print(row)
-    print('------------------------------------------')
-    print('Quantitativo de Situação de Registro')
-    print('------------------------------------------')
+        log += str(row) + "\n"
+    log += '------------------------------------------\n'
+    log += 'Quantitativo de Situação de Registro\n'
+    log += '------------------------------------------\n'
     cursor.execute("SELECT DISTINCT(situacao_registro) AS Situação, COUNT(situacao_registro) AS Quantidade FROM medicamentos GROUP BY Situação ORDER BY Quantidade DESC;")
     results = cursor.fetchall()
     for row in results:
-        print(row)
-    print('------------------------------------------')
-    print('Remédios de menor valor e sua categoria')
-    print('------------------------------------------')
+        log += str(row) + "\n"
+    log += '------------------------------------------\n'
+    log += 'Remédios de menor valor e sua categoria\n'
+    log += '------------------------------------------\n'
     cursor.execute("SELECT nome as NOME, categoria_regulatoria AS CATEGORIA, preco as PREÇO FROM medicamentos WHERE preco = (SELECT MIN(preco) FROM medicamentos) ORDER BY nome;")
     results = cursor.fetchall()
     for row in results:
-        print(row)
-    print('------------------------------------------')
-    print('Remédios de maior valor e sua categoria')
-    print('------------------------------------------')
+        log += str(row) + "\n"
+    log += '------------------------------------------\n'
+    log += 'Remédios de maior valor e sua categoria\n'
+    log += '------------------------------------------\n'
     cursor.execute("SELECT nome as NOME, categoria_regulatoria AS CATEGORIA, preco as PREÇO FROM medicamentos WHERE preco = (SELECT MAX(preco) FROM medicamentos) ORDER BY nome;")
     results = cursor.fetchall()
     for row in results:
-        print(row)
+        log += str(row) + "\n"
 
     conn.commit()
 
-    if cursor.rowcount == 1:
-        print(f'Relatório Exibido com sucesso')
-    else:
-        print(f'Erro ao reportar o Relatório')
+    desconectar(conn)
+
+    return log
+
