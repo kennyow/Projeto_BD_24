@@ -5,6 +5,8 @@ import PIL.ImageTk
 from tkinter import *
 from tkinter import ttk
 
+from tkinter.filedialog import asksaveasfile
+
 class StoreUI(Tk):
     def __init__(self, title, w, h, x, y):
         super().__init__()
@@ -18,6 +20,11 @@ class StoreUI(Tk):
 
     def main(self):
         self.mainloop()
+
+    def export_log(self):
+        data = asksaveasfile(mode='w', initialfile="relatorio.txt")
+        data.write(self.log)
+        data.close()
 
     def log_dialog(self):
         self.l_dialog = Toplevel(self)
@@ -41,9 +48,10 @@ class StoreUI(Tk):
         textbox = Text(self.l_dialog)
         textbox.grid(row=0, column=0, padx=(10, 10), sticky='nsew')
 
-        textbox.insert(END, log_products())
+        self.log = log_products()
+        textbox.insert(END, self.log)
 
-        newbtn = Button(self.l_dialog, text="Salvar", width=8, command=lambda: self.create())
+        newbtn = Button(self.l_dialog, text="Salvar", width=8, command=lambda: self.export_log())
         newbtn.grid(row=self.dialog_entries_size+2, column=0, pady=(10, 10))
 
         self.l_dialog.bind("<Return>", lambda x: self.create())
