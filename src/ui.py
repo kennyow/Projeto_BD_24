@@ -1,7 +1,3 @@
-from utils import *
-import PIL.Image
-import PIL.ImageTk
-
 from tkinter import *
 from tkinter import ttk
 
@@ -17,6 +13,11 @@ class StoreUI(Tk):
         self.sidebar_entries_size = 0
         self.dialog_entries_size = 0
         self.curr_prod = -1
+
+        self.db = None
+    
+    def connect(self, db):
+        self.db = db
 
     def main(self):
         self.mainloop()
@@ -48,7 +49,7 @@ class StoreUI(Tk):
         textbox = Text(self.l_dialog)
         textbox.grid(row=0, column=0, padx=(10, 10), sticky='nsew')
 
-        self.log = log_products()
+        self.log = self.db.log()
         textbox.insert(END, self.log)
 
         newbtn = Button(self.l_dialog, text="Salvar", width=8, command=lambda: self.export_log())
@@ -84,7 +85,7 @@ class StoreUI(Tk):
         active =         self.new_prod_active.get()
         price =           self.new_prod_price.get()
 
-        insert_product(name, category, limit_date, t_class, status, active, price)
+        self.db.create(name, category, limit_date, t_class, status, active, price)
 
         self.reset_list()
 
@@ -138,12 +139,12 @@ class StoreUI(Tk):
             active =         self.prod_active_v.get()
             price =           self.prod_price_v.get()
 
-            update_product(self.curr_prod, name, category, limit_date, t_class, status, active, price)
+            self.db.update(self.curr_prod, name, category, limit_date, t_class, status, active, price)
             self.reset_list()
 
     def delete(self):
         if self.curr_prod != -1:
-            delete_product(self.curr_prod)
+            self.db.delete(self.curr_prod)
             self.reset_list()
 
     def add_sidebar_entry(self, name, strvar):
@@ -215,13 +216,13 @@ class StoreUI(Tk):
         
         selection = int(self.parenttree.focus())
 
-        self.set_entry_value(self.product_name,                  ui.med_list[selection]['product']) 
-        self.set_entry_value(self.product_category,             ui.med_list[selection]['category']) 
-        self.set_entry_value(self.product_class,       ui.med_list[selection]['therapeutic_class']) 
-        self.set_entry_value(self.product_limit_date,         ui.med_list[selection]['limit_date']) 
-        self.set_entry_value(self.product_status,                 ui.med_list[selection]['status']) 
-        self.set_entry_value(self.product_active,                 ui.med_list[selection]['active']) 
-        self.set_entry_value(self.product_price,                   ui.med_list[selection]['price']) 
+        self.set_entry_value(self.product_name,                  self.med_list[selection]['product']) 
+        self.set_entry_value(self.product_category,             self.med_list[selection]['category']) 
+        self.set_entry_value(self.product_class,       self.med_list[selection]['therapeutic_class']) 
+        self.set_entry_value(self.product_limit_date,         self.med_list[selection]['limit_date']) 
+        self.set_entry_value(self.product_status,                 self.med_list[selection]['status']) 
+        self.set_entry_value(self.product_active,                 self.med_list[selection]['active']) 
+        self.set_entry_value(self.product_price,                   self.med_list[selection]['price']) 
 
         self.curr_prod = selection
 
@@ -231,7 +232,7 @@ class StoreUI(Tk):
         for item in self.parenttree.get_children():
             self.parenttree.delete(item)
 
-        initial_list = get_medicine_list()
+        initial_list = self.db.list()
         keys = [item['id'] for item in initial_list]
         self.med_list = dict(zip(keys, initial_list)) 
 
@@ -253,7 +254,7 @@ class StoreUI(Tk):
         for item in self.parenttree.get_children():
             self.parenttree.delete(item)
 
-        initial_list = get_medicine_list()
+        initial_list = self.db.list()
         keys = [item['id'] for item in initial_list]
         self.med_list = dict(zip(keys, initial_list)) 
 
@@ -262,61 +263,57 @@ class StoreUI(Tk):
 
         self.curr_prod = -1
 
+    def run(self):
+        self.rowconfigure(0, weight=1)
+        self.columnconfigure(0, weight=1)
 
-if __name__ == '__main__':
-    ui = StoreUI("Farmacia", 800, 600, 150, 150)
+        box_div = Frame(self)
+        box_div.rowconfigure(0, weight=1)
+        box_div.columnconfigure(0, weight=1)
+        box_div.grid(row=0, column=0, sticky='new')
 
-    ui.rowconfigure(0, weight=1)
-    ui.columnconfigure(0, weight=1)
+        div = Frame(box_div)
+        div.rowconfigure(0, weight=1)
+        div.columnconfigure(0, weight=1)
+        div.grid(row=0, column=0, sticky='n', pady=(10, 10))
 
-    box_div = Frame(ui)
-    box_div.rowconfigure(0, weight=1)
-    box_div.columnconfigure(0, weight=1)
-    box_div.grid(row=0, column=0, sticky='new')
+        newbtn = Button(div, text="Novo", width=8, command=lambda: self.create_dialog())
+        newbtn.grid(row=0, column=0, padx=(10, 5))
 
-    div = Frame(box_div)
-    div.rowconfigure(0, weight=1)
-    div.columnconfigure(0, weight=1)
-    div.grid(row=0, column=0, sticky='n', pady=(10, 10))
+        separator = ttk.Separator(div, orient='vertical')
+        separator.grid(row=0, column=1, sticky='ns', padx=(5, 10))
 
-    newbtn = Button(div, text="Novo", width=8, command=lambda: ui.create_dialog())
-    newbtn.grid(row=0, column=0, padx=(10, 5))
+        self.search_text = StringVar()
+        self.searchbox = Entry(div, width=35, textvariable=self.search_text)
+        self.searchbox.grid(row=0, column=2)
 
-    separator = ttk.Separator(div, orient='vertical')
-    separator.grid(row=0, column=1, sticky='ns', padx=(5, 10))
+        self.searchbox.bind('<Return>', lambda x: self.search_list())
 
-    ui.search_text = StringVar()
-    ui.searchbox = Entry(div, width=35, textvariable=ui.search_text)
-    ui.searchbox.grid(row=0, column=2)
+        searchbtn = Button(div, text="Pesquisar", width=8, command=lambda: self.search_list())
+        searchbtn.grid(row=0, column=3, padx=(10, 5))
 
-    ui.searchbox.bind('<Return>', lambda x: ui.search_list())
+        clearbtn = Button(div, text="Limpar", width=8, command=lambda: self.reset_list())
+        clearbtn.grid(row=0, column=4, padx=(5, 10))
 
-    searchbtn = Button(div, text="Pesquisar", width=8, command=lambda: ui.search_list())
-    searchbtn.grid(row=0, column=3, padx=(10, 5))
+        tree_div = Frame(box_div)
+        tree_div.rowconfigure(0, weight=1)
+        tree_div.columnconfigure(0, weight=1)
+        tree_div.grid(row=1, column=0, sticky='nsew')
 
-    clearbtn = Button(div, text="Limpar", width=8, command=lambda: ui.reset_list())
-    clearbtn.grid(row=0, column=4, padx=(5, 10))
+        self.parenttree = ttk.Treeview(tree_div, height=26)
+        self.parenttree.heading("#0", text="Medicamentos")
 
-    tree_div = Frame(box_div)
-    tree_div.rowconfigure(0, weight=1)
-    tree_div.columnconfigure(0, weight=1)
-    tree_div.grid(row=1, column=0, sticky='nsew')
+        initial_list = self.db.list()
+        keys = [item['id'] for item in initial_list]
+        self.med_list = dict(zip(keys, initial_list)) 
 
-    ui.parenttree = ttk.Treeview(tree_div, height=26)
-    ui.parenttree.heading("#0", text="Medicamentos")
+        for item in self.med_list.values():
+            self.parenttree.insert('', END, text=item['product'], iid=item['id'], open=False)
 
-    initial_list = get_medicine_list()
-    keys = [item['id'] for item in initial_list]
-    ui.med_list = dict(zip(keys, initial_list)) 
+        self.parenttree.grid(row=0, column=0, sticky='nsew')
+        self.parenttree.bind("<Double-Button-1>", lambda x: self.select_product())
+        self.parenttree.bind("<Return>",          lambda x: self.select_product())
 
-    for item in ui.med_list.values():
-        ui.parenttree.insert('', END, text=item['product'], iid=item['id'], open=False)
+        self.setup_sidebar()
 
-    ui.parenttree.grid(row=0, column=0, sticky='nsew')
-    ui.parenttree.bind("<Double-Button-1>", lambda x: ui.select_product())
-    ui.parenttree.bind("<Return>",          lambda x: ui.select_product())
-
-    ui.setup_sidebar()
-
-    ui.main()
-
+        self.main()
