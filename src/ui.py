@@ -10,6 +10,9 @@ class StoreUI(Tk):
         self.geometry("%dx%d+%d+%d" % (w, h, x, y))
         self.title(title)
 
+        self.rowconfigure(0, weight=1)
+        self.columnconfigure(0, weight=1)
+
         self.sidebar_entries_size = 0
         self.dialog_entries_size = 0
         self.curr_prod = -1
@@ -264,9 +267,6 @@ class StoreUI(Tk):
         self.curr_prod = -1
 
     def run(self):
-        self.rowconfigure(0, weight=1)
-        self.columnconfigure(0, weight=1)
-
         box_div = Frame(self)
         box_div.rowconfigure(0, weight=1)
         box_div.columnconfigure(0, weight=1)
