@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS medicamentos(
     categoria_regulatoria VARCHAR(40) NOT NULL,
     data_vencimento_registro DATE,
     classe_terapeutica VARCHAR(100) NOT NULL,
+    mari CHAR(1) NOT NULL,
     situacao_registro VARCHAR(15) NOT NULL,
     principio_ativo VARCHAR(400) NOT NULL,
     preco DECIMAL(10,2) NOT NULL,
