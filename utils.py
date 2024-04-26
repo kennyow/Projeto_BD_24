@@ -284,6 +284,28 @@ def exibir_clientes():
     finally:
         desconectar(conn)
 
+def inserir_cliente():
+    """
+    Função para inserir um cliente
+    """  
+    
+    conn = conectar()
+    cursor = conn.cursor()
+
+    print('CADASTRO DE CLIENTE')
+    nome = input('Nome do cliente: ')
+    telefone = input('Informe o telefone: ')
+    endereço = input('Informe o endereço: ')
+    cidade = input('Informe a cidade: ')
+    isflamengo = input('Informe se é Flamengo (y/n): ')
+    isonepiece = input('Informe se é fã de One Piece(y/n): ')
+    issousa = input('Informe se é de Sousa(y/n): ')  
+
+
+    cursor.execute(f"INSERT INTO clientes (idcliente, nome, telefone, endereco, cidade, isflamengo, isonepiece, issousa) VALUES (NULL, '{nome}', '{telefone}', '{endereço}', '{cidade}', '{isflamengo}', '{isonepiece}', '{issousa}')")
+    conn.commit()
+
+
 
 def menu():
     """
@@ -299,9 +321,9 @@ def menu():
     print('5 - Listar produto.')
     print('6 - Exibir relatório.')
     print('7 - Exibir clientes.')
-
+    print('8 - Inserir cliente.')
     opcao = int(input())
-    if opcao in [1, 2, 3, 4, 5, 6, 7]:
+    if opcao in [1, 2, 3, 4, 5, 6, 7, 8]:
         if opcao == 1:
             inserir()
         elif opcao == 2:
@@ -316,6 +338,8 @@ def menu():
             exibir()
         elif opcao == 7:
             exibir_clientes()
+        elif opcao == 8:
+            inserir_cliente()
         else:
             print('Opção inválida')
     else:
