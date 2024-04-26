@@ -252,6 +252,38 @@ def exibir():
     else:
         print(f'Erro ao reportar o Relatório')
 
+def exibir_clientes():
+    """
+    Função para exibir clientes cadastrados
+    """  
+    conn = conectar()
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute("SELECT * FROM clientes;")
+
+        clientes = cursor.fetchall()
+
+        if len(clientes) > 0:
+            print("Listando Clientes")
+            print("--------------------")
+            for cliente in clientes:
+                print(f"ID: {cliente[0]}")
+                print(f"Nome: {cliente[1]}")
+                print(f"Telefone: {cliente[2]}")
+                print(f"Endereço: {cliente[3]}")
+                print(f"Cidade: {cliente[4]}")
+                print(f"IsFlamengo: {cliente[5]}")
+                print(f"IsOnePiece: {cliente[6]}")
+                print(f"IsSousa: {cliente[7]}")
+                print("--------------------")
+        else:
+            print("Não existem clientes cadastrados")
+    except MySQLdb.Error as e:
+        print(f"Erro ao acessar a tabela clientes: {e}")
+    finally:
+        desconectar(conn)
+
 
 def menu():
     """
@@ -266,9 +298,10 @@ def menu():
     print('4 - Deletar produto.')
     print('5 - Listar produto.')
     print('6 - Exibir relatório.')
+    print('7 - Exibir clientes.')
 
     opcao = int(input())
-    if opcao in [1, 2, 3, 4, 5, 6]:
+    if opcao in [1, 2, 3, 4, 5, 6, 7]:
         if opcao == 1:
             inserir()
         elif opcao == 2:
@@ -281,6 +314,8 @@ def menu():
             listar()
         elif opcao == 6:
             exibir()
+        elif opcao == 7:
+            exibir_clientes()
         else:
             print('Opção inválida')
     else:
