@@ -67,12 +67,13 @@ def inserir():
     categoria = input('Informe a categoria: ')
     vencimento = input('Informe a data de vencimento (Ex: 21-12-2): ')
     classe = input('Informe a classe terapêutica: ')
-    situacao = input('Informe se é de Mari [S/N]: ').upper()
+    mari = input('Informe se é de Mari [S/N]: ').upper()
     situacao = input('Informe a situação de registro: ')
     principio = input('Informe o principio ativo: ')
+    estoque = int(input('Informe o estoque: '))
     preco = float(input('Informe o preço: '))  
 
-    cursor.execute(f"INSERT INTO medicamentos (id, nome, categoria_regulatoria, data_vencimento_registro, classe_terapeutica, situacao_registro, principio_ativo, preco) VALUES (NULL, '{nome}', '{categoria}', '{vencimento}', '{classe}', '{situacao}', '{principio}', {preco})")
+    cursor.execute(f"INSERT INTO medicamentos (id, nome, categoria_regulatoria, data_vencimento_registro, classe_terapeutica, mari, situacao_registro, principio_ativo, estoque, preco) VALUES (NULL, '{nome}', '{categoria}', '{vencimento}', '{classe}', '{mari}', '{situacao}', '{principio}', '{estoque}',{preco})")
     conn.commit()
 
 
@@ -98,9 +99,12 @@ def atualizar():
     situacao = input('Informe se é de Mari [S/N]: ').upper()
     situacao = input('Informe a situação de registro: ')
     principio = input('Informe o principio ativo: ')
+    estoque = int(input('Informe o estoque: '))
     preco = float(input('Informe o preço: ')) 
 
-    cursor.execute(f"UPDATE medicamentos SET nome='{nome}', categoria_regulatoria='{categoria}', data_vencimento_registro='{vencimento}', classe_terapeutica='{classe}', situacao_registro='{situacao}', principio_ativo='{principio}', preco='{preco}' WHERE id='{codigo}'")
+   
+    cursor.execute(f"UPDATE medicamentos SET nome='{nome}', categoria_regulatoria='{categoria}', data_vencimento_registro='{vencimento}', classe_terapeutica='{classe}', situacao_registro='{situacao}', principio_ativo='{principio}', estoque='{estoque}', preco={preco} WHERE id='{codigo}'")
+
 
     conn.commit()
 
@@ -306,7 +310,19 @@ def inserir_cliente():
     cursor.execute(f"INSERT INTO clientes (idcliente, nome, telefone, email, isflamengo, isonepiece, issousa, usuario, senha) VALUES (NULL, '{nome}', '{telefone}', '{email}', '{isflamengo}', '{isonepiece}', '{issousa}', '{usuario}', '{senha}' )")
     conn.commit()
 
+def comprar_produtos():
+    """
+    Função para comprar medicamentos
+    """  
+    
+    conn = conectar()
+    cursor = conn.cursor()
 
+    ask = int(input('Qual medicamento deseja adquirir? [id]: '))
+    cursor.execute(f"SELECT id, nome FROM medicamentos WHERE id = '{ask}'")
+    results = cursor.fetchall()
+    for row in results:
+        print(row)
 
 def menu():
     """
@@ -323,8 +339,9 @@ def menu():
     print('6 - Exibir relatório.')
     print('7 - Exibir clientes.')
     print('8 - Inserir cliente.')
+    print('9 - Comprar produtos.')
     opcao = int(input())
-    if opcao in [1, 2, 3, 4, 5, 6, 7, 8]:
+    if opcao in [1, 2, 3, 4, 5, 6, 7, 8, 9]:
         if opcao == 1:
             inserir()
         elif opcao == 2:
@@ -341,6 +358,8 @@ def menu():
             exibir_clientes()
         elif opcao == 8:
             inserir_cliente()
+        elif opcao == 9:
+            comprar_produtos()
         else:
             print('Opção inválida')
     else:
