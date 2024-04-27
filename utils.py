@@ -161,6 +161,7 @@ def pesquisar():
             print("--------------------")
         else:
             print("Medicamento não encontrado")
+        return produto
     elif ask == 2:
         aid = int(input('Informe o id do medicamento: '))
         cursor.execute(f"SELECT * FROM medicamentos WHERE id={aid}")
@@ -179,6 +180,7 @@ def pesquisar():
             print("--------------------")
         else:
             print("Medicamento não encontrado")
+        return produto
     else:
         print("Opção inválida")
 
@@ -317,12 +319,23 @@ def comprar_produtos():
     
     conn = conectar()
     cursor = conn.cursor()
+    login = input('Login: ')
+    senha = input('Senha: ')
 
-    ask = int(input('Qual medicamento deseja adquirir? [id]: '))
-    cursor.execute(f"SELECT id, nome FROM medicamentos WHERE id = '{ask}'")
-    results = cursor.fetchall()
-    for row in results:
-        print(row)
+    welcome = cursor.execute(f"SELECT 'BEM VINDO' FROM clientes WHERE usuario= '{login}' AND senha = '{senha}'")
+    
+    if welcome == 1:
+        print("Login efetuado com sucesso!")
+        med = pesquisar()
+        print(f'Encontrados: {med}')
+        '''ask = int(input('Qual medicamento deseja adquirir? [id]: '))
+        cursor.execute(f"SELECT id, nome FROM medicamentos WHERE id = '{ask}'")
+        results = cursor.fetchall()
+        for row in results:
+            print(row)'''
+    else:
+        print('Usuário ou senha incorretos.')
+    
 
 def menu():
     """
