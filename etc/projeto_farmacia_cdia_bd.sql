@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS medicamentos(
     mari CHAR(1) NOT NULL,
     situacao_registro VARCHAR(15) NOT NULL,
     principio_ativo VARCHAR(400) NOT NULL,
+    estoque INT NOT NULL,
     preco DECIMAL(10,2) NOT NULL,
     PRIMARY KEY (id)
 );
@@ -51,5 +52,79 @@ SELECT nome as NOME, categoria_regulatoria AS CATEGORIA, classe_terapeutica AS C
 FROM medicamentos
 WHERE preco = (SELECT MAX(preco) FROM medicamentos)
 ORDER BY nome;
+
+
+CREATE TABLE IF NOT EXISTS clientes(
+    idcliente INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(50) NOT NULL,
+    telefone VARCHAR(10) NOT NULL,
+    email VARCHAR(40),
+    isflamengo CHAR(1) NOT NULL,
+    isonepiece CHAR(1) NOT NULL,
+    issousa CHAR(1) NOT NULL,
+    usuario VARCHAR(20) NOT NULL,
+    senha VARCHAR(6) NOT NULL
+);
+
+INSERT INTO clientes (nome, telefone, email, isflamengo, isonepiece, issousa, usuario, senha) VALUES
+('Luke Skywalker', '1234567890', 'luke@rebels.com', 'N', 'Y', 'N', 'skywalker', '123abc'),
+('Leia Organa', '9876543210', 'leia@rebels.com', 'N', 'N', 'N', 'organa', '456def'),
+('Han Solo', '5551234567', 'han@solo.com', 'Y', 'N', 'N', 'solo', '789ghi'),
+('Darth Vader', '9998887776', 'vader@empire.com', 'N', 'N', 'N', 'vader', 'abc123'),
+('Obi-Wan Kenobi', '1112223334', 'obiwan@jedi.com', 'N', 'Y', 'N', 'obiwan', 'def456'),
+('Yoda', '7778889990', 'yoda@jedi.com', 'N', 'N', 'N', 'yoda', 'ghi789'),
+('Padmé Amidala', '3334445556', 'padme@naboo.com', 'N', 'N', 'N', 'padme', '123456'),
+('Chewbacca', '8887776665', 'chewie@wookiee.com', 'N', 'N', 'N', 'chewbacca', '456abc'),
+('R2-D2', '2223334447', 'r2d2@droids.com', 'N', 'N', 'N', 'r2d2', '789def'),
+('C-3PO', '4445556663', 'c3po@droids.com', 'N', 'N', 'N', 'c3po', 'abc456'),
+('Mace Windu', '6667778889', 'mace@jedi.com', 'N', 'N', 'Y', 'macewindu', 'def789');
+
+
+CREATE TABLE vendedores(
+	idvendedor INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(50) NOT NULL
+);
+
+INSERT INTO vendedores (nome) VALUES
+('Monkey D. Luffy'),
+('Roronoa Zoro'),
+('Nami'),
+('Usopp'),
+('Sanji'),
+('Tony Tony Chopper'),
+('Nico Robin');
+
+
+
+CREATE TABLE compras (
+    idcompra INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    idcliente INT NOT NULL,
+    idvendedor INT NOT NULL,
+    data_compra TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    valor_total DECIMAL(10, 2) NOT NULL,
+    forma_pagamento ENUM('cartao', 'boleto', 'pix', 'berries') NOT NULL,
+    status_pagamento ENUM('pendente', 'confirmado') DEFAULT 'pendente',
+    FOREIGN KEY (idcliente) REFERENCES clientes(idcliente),
+    FOREIGN KEY (idvendedor) REFERENCES vendedores(idvendedor)
+);
+
+
+CREATE TABLE itens_compra (
+    iditem INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    idcompra INT NOT NULL,
+    nome_item VARCHAR(100) NOT NULL,
+    quantidade INT NOT NULL,
+    preco_unitario DECIMAL(10, 2) NOT NULL,
+    FOREIGN KEY (idcompra) REFERENCES compras(idcompra)
+);
+
+
+DROP TABLE compras;
+SELECT * FROM vendedores;
+SELECT * FROM clientes;
+DESC clientes;
+DROP TABLE clientes;
+DROP TABLE medicamentos;
+SELECT * FROM medicamentos;
 
 
