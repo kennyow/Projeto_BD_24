@@ -326,8 +326,25 @@ def comprar_produtos():
     
     if welcome == 1:
         print("Login efetuado com sucesso!")
-        med = pesquisar()
-        print(f'Encontrados: {med}')
+
+        fim = ''
+        compras_lista = []  
+
+        while fim != 'N':
+            med = pesquisar()
+            qtde = int(input('Quantas unidades deseja adquirir? '))
+            print(f'Encontrados: {med}')
+            chave = med[0]
+            valor = float(med[-1] * qtde)
+            print(f'Valor encontrado: {valor}')
+            compras_lista.append((chave, valor))  
+            fim = input('Deseja realizar uma nova compra? [S/N]').strip().upper()
+
+        compras_dict = dict(compras_lista)
+
+        print(compras_dict)
+
+            
         '''ask = int(input('Qual medicamento deseja adquirir? [id]: '))
         cursor.execute(f"SELECT id, nome FROM medicamentos WHERE id = '{ask}'")
         results = cursor.fetchall()
