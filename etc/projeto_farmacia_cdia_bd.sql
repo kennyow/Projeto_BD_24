@@ -2,23 +2,8 @@
 CREATE DATABASE farmacia;
 USE farmacia;
 
-CREATE TABLE IF NOT EXISTS medicamentos(
-    id INT NOT NULL AUTO_INCREMENT,
-    nome VARCHAR(100) NOT NULL,
-    categoria_regulatoria VARCHAR(40) NOT NULL,
-    data_vencimento_registro DATE,
-    classe_terapeutica VARCHAR(100) NOT NULL,
-    mari CHAR(1) NOT NULL,
-    situacao_registro VARCHAR(15) NOT NULL,
-    principio_ativo VARCHAR(400) NOT NULL,
-    estoque INT NOT NULL,
-    preco DECIMAL(10,2) NOT NULL,
-    PRIMARY KEY (id)
-);
 
-
--- COMANDOS UTILIZADOS NO RELATÓRIO 
-
+-- ----------------------------------------------------------------COMANDOS UTILIZADOS NO RELATÓRIO --------------------------------
 -- Quantidade de Medicamentos
 SELECT COUNT(nome) AS QtdeMed
 FROM medicamentos;
@@ -54,6 +39,22 @@ WHERE preco = (SELECT MAX(preco) FROM medicamentos)
 ORDER BY nome;
 
 
+-- ---------------------------------------------------------------- MEDICAMETOS--------------------------------
+CREATE TABLE IF NOT EXISTS medicamentos(
+    id INT NOT NULL AUTO_INCREMENT,
+    nome VARCHAR(100) NOT NULL,
+    categoria_regulatoria VARCHAR(40) NOT NULL,
+    data_vencimento_registro DATE,
+    classe_terapeutica VARCHAR(100) NOT NULL,
+    mari CHAR(1) NOT NULL,
+    situacao_registro VARCHAR(15) NOT NULL,
+    principio_ativo VARCHAR(400) NOT NULL,
+    estoque INT NOT NULL,
+    preco DECIMAL(10,2) NOT NULL,
+    PRIMARY KEY (id)
+);
+
+-- ---------------------------------------------------------------- CLIENTES --------------------------------
 CREATE TABLE IF NOT EXISTS clientes(
     idcliente INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(50) NOT NULL,
@@ -80,22 +81,27 @@ INSERT INTO clientes (nome, telefone, email, isflamengo, isonepiece, issousa, us
 ('Mace Windu', '6667778889', 'mace@jedi.com', 'N', 'N', 'Y', 'macewindu', 'def789');
 
 
+-- ---------------------------------------------------------------- VENDEDORES--------------------------------
 CREATE TABLE vendedores(
 	idvendedor INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    nome VARCHAR(50) NOT NULL
+    nome VARCHAR(50) NOT NULL,
+    usuario VARCHAR(50) NOT NULL,
+	senha VARCHAR(50) UNIQUE NOT NULL
 );
 
-INSERT INTO vendedores (nome) VALUES
-('Monkey D. Luffy'),
-('Roronoa Zoro'),
-('Nami'),
-('Usopp'),
-('Sanji'),
-('Tony Tony Chopper'),
-('Nico Robin');
+INSERT INTO vendedores (nome, usuario, senha)
+VALUES
+('Monkey D. Luffy', 'luffy', 'strawhat'),
+('Roronoa Zoro', 'zoro', 'swordsman'),
+('Nami', 'nami', 'navigator'),
+('Vinsmoke Sanji', 'sanji', 'cook'),
+('Nico Robin', 'robin', 'archaeologist');
 
+CREATE VIEW vendedores_nomes AS
+	SELECT idvendedor, nome
+    FROM vendedores;
 
-
+-- ---------------------------------------------------------------- COMPRAS --------------------------------
 CREATE TABLE compras (
     idcompra INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     idcliente INT NOT NULL,
@@ -108,7 +114,7 @@ CREATE TABLE compras (
     FOREIGN KEY (idvendedor) REFERENCES vendedores(idvendedor)
 );
 
-
+-- ---------------------------------------------------------------- FALTA IMPLEMENTAR --------------------------------
 CREATE TABLE itens_compra (
     iditem INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     idcompra INT NOT NULL,
@@ -119,12 +125,15 @@ CREATE TABLE itens_compra (
 );
 
 
+    
+ -- ---------------------------------------------------------------- ETC --------------------------------   
 DROP TABLE compras;
+SELECT * FROM compras;
 SELECT * FROM vendedores;
 SELECT * FROM clientes;
 DESC clientes;
 DROP TABLE clientes;
 DROP TABLE medicamentos;
 SELECT * FROM medicamentos;
-
-
+DROP TABLE vendedores;
+SELECT * FROM vendedores_nomes;
