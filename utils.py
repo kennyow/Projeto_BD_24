@@ -342,11 +342,14 @@ def comprar_produtos():
             compras_lista.append((chave, valor))  
             fim = input('Deseja realizar uma nova compra? [S/N]').strip().upper()
         pgmt = int(input("Qual a forma de pagamento? \n"
-                        "1 - Débito \n"
-                        "2- Crédito \n"
-                        "3- Berries "))
+                        "1 - Cartão \n"
+                        "2 - Boleto \n"
+                        "3 - Pix \n"
+                        "4 - Berries "))
         compras_dict = dict(compras_lista)
         print(compras_dict)
+        print(cursor.execute("SELECT * FROM vendedores_nomes"))
+        vendedor = int(input("Selecione o vendedor que o atendeu: "))
 
         query = """
         CREATE PROCEDURE conta @a INT, @b INT, @c INT
