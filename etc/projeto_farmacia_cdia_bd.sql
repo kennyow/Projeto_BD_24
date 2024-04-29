@@ -114,7 +114,7 @@ CREATE TABLE compras (
     FOREIGN KEY (idvendedor) REFERENCES vendedores(idvendedor)
 );
 
--- ---------------------------------------------------------------- FALTA IMPLEMENTAR --------------------------------
+-- ---------------------------------------------------------------- ITENS COMPRA --------------------------------
 CREATE TABLE itens_compra (
     iditem INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     idcompra INT NOT NULL,
