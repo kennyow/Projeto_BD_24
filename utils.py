@@ -155,9 +155,10 @@ def pesquisar():
             print(f"Categoria: {produto[2]}")
             print(f"Vencimento: {produto[3]}")
             print(f"Classe Terapêutica: {produto[4]}")
-            print(f"Situação: {produto[5]}")
-            print(f"Princípio Ativo: {produto[6]}")
-            print(f"Valor: R$ {produto[7]}")
+            print(f"Situação: {produto[6]}")
+            print(f"Princípio Ativo: {produto[7]}")
+            print(f"Estoque: {produto[8]} Unidades")
+            print(f"Valor: R$ {produto[9]}")
             print("--------------------")
         else:
             print("Medicamento não encontrado")
@@ -174,9 +175,10 @@ def pesquisar():
             print(f"Categoria: {produto[2]}")
             print(f"Vencimento: {produto[3]}")
             print(f"Classe Terapêutica: {produto[4]}")
-            print(f"Situação: {produto[5]}")
-            print(f"Princípio Ativo: {produto[6]}")
-            print(f"Valor: R$ {produto[7]}")
+            print(f"Situação: {produto[6]}")
+            print(f"Princípio Ativo: {produto[7]}")
+            print(f"Estoque: {produto[8]} Unidades")
+            print(f"Valor: R$ {produto[9]}")
             print("--------------------")
         else:
             print("Medicamento não encontrado")
@@ -339,10 +341,32 @@ def comprar_produtos():
             print(f'Valor encontrado: {valor}')
             compras_lista.append((chave, valor))  
             fim = input('Deseja realizar uma nova compra? [S/N]').strip().upper()
-
+        pgmt = int(input("Qual a forma de pagamento? \n"
+                        "1 - Débito \n"
+                        "2- Crédito \n"
+                        "3- Berries "))
         compras_dict = dict(compras_lista)
-
         print(compras_dict)
+
+        query = """
+        CREATE PROCEDURE conta @a INT, @b INT, @c INT
+        AS
+        BEGIN
+            INSERT INTO compras VALUES (@a, @b, @c);
+            idcompra INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    idcliente INT NOT NULL,
+    idvendedor INT NOT NULL,
+    data_compra TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    valor_total DECIMAL(10, 2) NOT NULL,
+    forma_pagamento ENUM('cartao', 'boleto', 'pix', 'berries') NOT NULL,
+    status_pagamento ENUM('pendente', 'confirmado') DEFAULT 'pendente',
+        END
+        """
+
+        # Executar a consulta para criar a stored procedure
+        cursor.execute(query)
+        conn.commit()
+        
 
             
         '''ask = int(input('Qual medicamento deseja adquirir? [id]: '))
