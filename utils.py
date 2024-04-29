@@ -341,11 +341,20 @@ def comprar_produtos():
             print(f'Valor total parcial: {valor}')
             compras_lista.append((chave, valor))  
             fim = input('Deseja realizar uma nova compra? [S/N]').strip().upper()
-        pgmt = int(input("Qual a forma de pagamento? \n"
-                        "1 - Cartão \n"
-                        "2 - Boleto \n"
-                        "3 - Pix \n"
-                        "4 - Berries "))
+
+        while True:
+            pgmt = int(input("Qual a forma de pagamento?\n"
+                            "1 - Cartão\n"
+                            "2 - Boleto\n"
+                            "3 - Pix\n"
+                            "4 - Berries\n"))
+
+            if pgmt in [1, 2, 3, 4]:
+                break
+            else:
+                print("Opção inválida. Por favor, escolha uma das opções listadas.")
+
+        
         compras_dict = dict(compras_lista)
         print(compras_dict)
         cursor.execute("SELECT * FROM vendedores_nomes")
