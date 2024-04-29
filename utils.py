@@ -338,7 +338,7 @@ def comprar_produtos():
             print(f'Encontrados: {med}')
             chave = med[0]
             valor = float(med[-1] * qtde)
-            print(f'Valor encontrado: {valor}')
+            print(f'Valor total parcial: {valor}')
             compras_lista.append((chave, valor))  
             fim = input('Deseja realizar uma nova compra? [S/N]').strip().upper()
         pgmt = int(input("Qual a forma de pagamento? \n"
@@ -348,7 +348,17 @@ def comprar_produtos():
                         "4 - Berries "))
         compras_dict = dict(compras_lista)
         print(compras_dict)
-        print(cursor.execute("SELECT * FROM vendedores_nomes"))
+        cursor.execute("SELECT * FROM vendedores_nomes")
+
+        vendedores = cursor.fetchall()
+
+        if len(vendedores) > 0:
+            print("Listando Vendedores")
+            print("--------------------")
+            for vendedor in vendedores:
+                print(f"ID: {vendedor[0]} || Nome: {vendedor[1]}")
+                print("--------------------")
+        
         vendedor = int(input("Selecione o vendedor que o atendeu: "))
 
         query = """
