@@ -324,11 +324,19 @@ def comprar_produtos():
     login = input('Login: ')
     senha = input('Senha: ')
 
-    welcome = cursor.execute(f"SELECT 'BEM VINDO' FROM clientes WHERE usuario= '{login}' AND senha = '{senha}'")
-    
+    welcome = cursor.execute(f"SELECT * FROM clientes WHERE usuario= '{login}' AND senha = '{senha}'")
+    # Obtenha o resultado da consulta
+    resultado = cursor.fetchone()
+
+    # Verifique se algum resultado foi retornado
+    if resultado:
+        id_usuario = resultado[0]
+        print(f'ID DO USUÁRIO: {id_usuario}')
+    else:
+        print('Usuário ou senha incorretos.')
     if welcome == 1:
         print("Login efetuado com sucesso!")
-
+        id_usuario = cursor.execute(f"SELECT idcliente FROM clientes WHERE usuario= '{login}' AND senha = '{senha}'")
         fim = ''
         compras_lista = []  
 
@@ -341,7 +349,7 @@ def comprar_produtos():
             print(f'Valor total parcial: {valor}')
             compras_lista.append((chave, valor))  
             fim = input('Deseja realizar uma nova compra? [S/N]').strip().upper()
-
+        
         while True:
             pgmt = int(input("Qual a forma de pagamento?\n"
                             "1 - Cartão\n"
@@ -357,6 +365,10 @@ def comprar_produtos():
         
         compras_dict = dict(compras_lista)
         print(compras_dict)
+        for key, values in compras_dict.items():
+            total += values
+
+        print(f"Valor total da compra R$: {total}")
         cursor.execute("SELECT * FROM vendedores_nomes")
 
         vendedores = cursor.fetchall()
@@ -370,18 +382,19 @@ def comprar_produtos():
         
         vendedor = int(input("Selecione o vendedor que o atendeu: "))
 
-        query = """
+        query = f"""
         CREATE PROCEDURE conta @a INT, @b INT, @c INT
         AS
         BEGIN
-            INSERT INTO compras VALUES (@a, @b, @c);
-            idcompra INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    idcliente INT NOT NULL,
-    idvendedor INT NOT NULL,
-    data_compra TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    valor_total DECIMAL(10, 2) NOT NULL,
-    forma_pagamento ENUM('cartao', 'boleto', 'pix', 'berries') NOT NULL,
-    status_pagamento ENUM('pendente', 'confirmado') DEFAULT 'pendente',
+            INSERT INTO compras VALUES (NULL, 
+                                {id_usuario}, 
+                                {vendedor}, 
+                                NULL, );
+            
+            
+            valor_total DECIMAL(10, 2) NOT NULL,
+            forma_pagamento ENUM('cartao', 'boleto', 'pix', 'berries') NOT NULL,
+            status_pagamento ENUM('pendente', 'confirmado') DEFAULT 'pendente',
         END
         """
 
