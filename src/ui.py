@@ -137,12 +137,51 @@ class StoreUI(Tk):
 
         self.dialog.bind("<Return>", lambda x: self.create())
 
+    def add_product(self):
+        self.subtotal += 5
+        self.subtotal_str.set(f"Subtotal: R$ {self.subtotal:.2f}")
+
+    def store_dialog(self):
+        self.dialog = Toplevel(self)
+        self.dialog.title("Comprar")
+
+        w = 400
+        h = 300
+        x = 300
+        y = 200
+
+        self.dialog.geometry("%dx%d+%d+%d" % (w, h, x, y))
+
+        self.dialog.rowconfigure(0, weight=1)
+        self.dialog.columnconfigure(0, weight=1)
+
+        self.dialog_div = Frame(self.dialog)
+        self.dialog_div.rowconfigure(0, weight=1)
+        self.dialog_div.columnconfigure(0, weight=1)
+        self.dialog_div.grid(row=0, column=0, sticky='new', pady=(20, 20))
+
+        self.dialog_entries_size = 0
+
+        qt = StringVar()
+        self.subtotal = 0.0
+        self.subtotal_str = StringVar()
+        self.subtotal_str.set(f"Subtotal: R$ {self.subtotal:.2f}")
+
+        quantity =   self.add_dialog_entry("Quantidade", qt)
+
+        subtotal_label = Label(self.dialog, textvariable=self.subtotal_str, width=22, relief=GROOVE)
+        subtotal_label.grid(row=self.dialog_entries_size+1, column=0, sticky='n', pady=(12, 12))
+
+        newbtn = Button(self.dialog, text="Adicionar produto", width=15, command=lambda: self.add_product())
+        newbtn.grid(row=self.dialog_entries_size+2, column=0, pady=(10, 10))
+
     def do_login(self, uname, pwd):
         if self.db.login(uname.get(), pwd.get()):
             self.dialog.destroy()
             self.dialog.update()
             self.username = uname.get()
             self.password = pwd.get()
+            self.store_dialog()
         else:
             self.incorrect_login_data = Label(self.dialog, text="Usuario ou senha incorretos", width=22)
             self.incorrect_login_data.grid(row=self.dialog_entries_size+3, column=0, sticky='n', pady=(12, 12))
