@@ -17,6 +17,9 @@ class StoreUI(Tk):
         self.dialog_entries_size = 0
         self.curr_prod = -1
 
+        self.username = ""
+        self.password = ""
+
         self.db = None
     
     def connect(self, db):
@@ -119,6 +122,8 @@ class StoreUI(Tk):
         self.new_prod_active =     StringVar()
         self.new_prod_price =      StringVar()
 
+        self.dialog_entries_size = 0
+
         product_name =                      self.add_dialog_entry("Nome", self.new_prod_name)
         product_category =         self.add_dialog_entry("Categoria", self.new_prod_category)
         product_class =      self.add_dialog_entry("Classe terapeutica", self.new_prod_class)
@@ -131,6 +136,49 @@ class StoreUI(Tk):
         newbtn.grid(row=self.dialog_entries_size+2, column=0, pady=(10, 10))
 
         self.dialog.bind("<Return>", lambda x: self.create())
+
+    def do_login(self, uname, pwd):
+        if self.db.login(uname.get(), pwd.get()):
+            self.dialog.destroy()
+            self.dialog.update()
+            self.username = uname.get()
+            self.password = pwd.get()
+        else:
+            self.incorrect_login_data = Label(self.dialog, text="Usuario ou senha incorretos", width=22)
+            self.incorrect_login_data.grid(row=self.dialog_entries_size+3, column=0, sticky='n', pady=(12, 12))
+
+    def login_dialog(self):
+        self.dialog = Toplevel(self)
+        self.dialog.title("Login")
+
+        w = 400
+        h = 200
+        x = 300
+        y = 200
+
+        self.dialog.geometry("%dx%d+%d+%d" % (w, h, x, y))
+
+        self.dialog.rowconfigure(0, weight=1)
+        self.dialog.columnconfigure(0, weight=1)
+
+        self.dialog_div = Frame(self.dialog)
+        self.dialog_div.rowconfigure(0, weight=1)
+        self.dialog_div.columnconfigure(0, weight=1)
+        self.dialog_div.grid(row=0, column=0, sticky='new', pady=(20, 20))
+
+        self.dialog_entries_size = 0
+
+        uname = StringVar()
+        pwd =   StringVar()
+
+        username =   self.add_dialog_entry("Usuario", uname)
+        password =       self.add_dialog_entry("Senha", pwd)
+
+        newbtn = Button(self.dialog, text="Entrar", width=8, command=lambda: self.do_login(uname, pwd))
+        newbtn.grid(row=self.dialog_entries_size+2, column=0, pady=(10, 10))
+
+
+
 
     def update(self):
         if self.curr_prod != -1:
@@ -204,8 +252,16 @@ class StoreUI(Tk):
         separator = ttk.Separator(self.sidebar, orient='horizontal')
         separator.grid(row=self.sidebar_entries_size+3, column=0, sticky='ew', pady=(10, 10))
 
-        logbtn = Button(self.sidebar, text="Relatorio", width=8, command=lambda: self.log_dialog())
-        logbtn.grid(row=self.sidebar_entries_size+4, column=0)
+        buttons_div2 = Frame(self.sidebar)
+        buttons_div2.rowconfigure(0, weight=1)
+        buttons_div2.columnconfigure(1, weight=1)
+        buttons_div2.grid(row=self.sidebar_entries_size+4, column=0, sticky='n', pady=(10, 10))
+
+        logbtn = Button(buttons_div2, text="Relatorio", width=8, command=lambda: self.log_dialog())
+        logbtn.grid(row=0, column=0, padx=(10, 5))
+
+        storebtn = Button(buttons_div2, text="Abrir loja", width=8, command=lambda: self.login_dialog())
+        storebtn.grid(row=0, column=1, padx=(5, 10))
 
     def set_entry_value(self, component, value):
         component.delete(0, END)

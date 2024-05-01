@@ -141,4 +141,97 @@ class DataProvider:
         self.close()
 
         return log
+    
+    def login(self, uname, pwd):
+        self.open()
+        cursor = self.conn.cursor()
 
+        cursor.execute("SELECT * FROM clientes WHERE usuario=%s AND senha =%s",
+                       (uname, pwd))
+        
+        result = cursor.fetchone()
+
+        #self.conn.commit()
+
+        self.close()
+
+        return result
+
+# def comprar_produtos():
+#     if welcome == 1:
+#         print("Login efetuado com sucesso!")
+#         id_usuario = cursor.execute(f"SELECT idcliente FROM clientes WHERE usuario= '{login}' AND senha = '{senha}'")
+#         fim = ''
+#         compras_lista = []  
+
+#         while fim != 'N':
+#             med = pesquisar()
+#             qtde = int(input('Quantas unidades deseja adquirir? '))
+#             print(f'Encontrados: {med}')
+#             chave = med[0]
+#             valor = float(med[-1] * qtde)
+#             print(f'Valor total parcial: {valor}')
+#             compras_lista.append((chave, valor))  
+#             fim = input('Deseja realizar uma nova compra? [S/N]').strip().upper()
+        
+#         while True:
+#             pgmt = int(input("Qual a forma de pagamento?\n"
+#                             "1 - Cartão\n"
+#                             "2 - Boleto\n"
+#                             "3 - Pix\n"
+#                             "4 - Berries\n"))
+
+#             if pgmt in [1, 2, 3, 4]:
+#                 break
+#             else:
+#                 print("Opção inválida. Por favor, escolha uma das opções listadas.")
+
+        
+#         compras_dict = dict(compras_lista)
+#         print(compras_dict)
+#         for key, values in compras_dict.items():
+#             total += values
+
+#         print(f"Valor total da compra R$: {total}")
+#         cursor.execute("SELECT * FROM vendedores_nomes")
+
+#         vendedores = cursor.fetchall()
+
+#         if len(vendedores) > 0:
+#             print("Listando Vendedores")
+#             print("--------------------")
+#             for vendedor in vendedores:
+#                 print(f"ID: {vendedor[0]} || Nome: {vendedor[1]}")
+#                 print("--------------------")
+        
+#         vendedor = int(input("Selecione o vendedor que o atendeu: "))
+
+#         query = f"""
+#         CREATE PROCEDURE conta @a INT, @b INT, @c INT
+#         AS
+#         BEGIN
+#             INSERT INTO compras VALUES (NULL, 
+#                                 {id_usuario}, 
+#                                 {vendedor}, 
+#                                 NULL, );
+            
+            
+#             valor_total DECIMAL(10, 2) NOT NULL,
+#             forma_pagamento ENUM('cartao', 'boleto', 'pix', 'berries') NOT NULL,
+#             status_pagamento ENUM('pendente', 'confirmado') DEFAULT 'pendente',
+#         END
+#         """
+
+#         # Executar a consulta para criar a stored procedure
+#         cursor.execute(query)
+#         conn.commit()
+        
+
+            
+#         '''ask = int(input('Qual medicamento deseja adquirir? [id]: '))
+#         cursor.execute(f"SELECT id, nome FROM medicamentos WHERE id = '{ask}'")
+#         results = cursor.fetchall()
+#         for row in results:
+#             print(row)'''
+#     else:
+#         print('Usuário ou senha incorretos.')

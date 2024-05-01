@@ -334,6 +334,7 @@ def comprar_produtos():
         print(f'ID DO USUÁRIO: {id_usuario}')
     else:
         print('Usuário ou senha incorretos.')
+        
     if welcome == 1:
         print("Login efetuado com sucesso!")
         id_usuario = cursor.execute(f"SELECT idcliente FROM clientes WHERE usuario= '{login}' AND senha = '{senha}'")
