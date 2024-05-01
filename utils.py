@@ -1,5 +1,5 @@
 import MySQLdb
-
+import datetime
 
 
 def conectar():
@@ -303,7 +303,7 @@ def inserir_cliente():
 
     print('CADASTRO DE CLIENTE')
     nome = input('Nome do cliente: ')
-    telefone = input('Informe o telefone: ')
+    telefone = input('Informe o telef# Obtenha o resultado da consultaone: ')
     email = input('Informe o email do usuário: ')
     isflamengo = input('Informe se é Flamengo (y/n): ')
     isonepiece = input('Informe se é fã de One Piece(y/n): ')
@@ -321,56 +321,23 @@ def comprar_produtos():
     
     conn = conectar()
     cursor = conn.cursor()
+    
+    data_atual = datetime.date.today()
+    data_formatada = data_atual.strftime('%Y-%m-%d')
+
     login = input('Login: ')
     senha = input('Senha: ')
 
-    welcome = cursor.execute(f"SELECT * FROM clientes WHERE usuario= '{login}' AND senha = '{senha}'")
-    # Obtenha o resultado da consulta
-    resultado = cursor.fetchone()
 
-    # Verifique se algum resultado foi retornado
+    cursor.execute("SELECT idcliente FROM clientes WHERE usuario = %s AND senha = %s", (login, senha))
+    resultado = cursor.fetchone()
     if resultado:
         id_usuario = resultado[0]
         print(f'ID DO USUÁRIO: {id_usuario}')
-    else:
-        print('Usuário ou senha incorretos.')
-    if welcome == 1:
         print("Login efetuado com sucesso!")
-        id_usuario = cursor.execute(f"SELECT idcliente FROM clientes WHERE usuario= '{login}' AND senha = '{senha}'")
-        fim = ''
-        compras_lista = []  
 
-        while fim != 'N':
-            med = pesquisar()
-            qtde = int(input('Quantas unidades deseja adquirir? '))
-            print(f'Encontrados: {med}')
-            chave = med[0]
-            valor = float(med[-1] * qtde)
-            print(f'Valor total parcial: {valor}')
-            compras_lista.append((chave, valor))  
-            fim = input('Deseja realizar uma nova compra? [S/N]').strip().upper()
-        
-        while True:
-            pgmt = int(input("Qual a forma de pagamento?\n"
-                            "1 - Cartão\n"
-                            "2 - Boleto\n"
-                            "3 - Pix\n"
-                            "4 - Berries\n"))
-
-            if pgmt in [1, 2, 3, 4]:
-                break
-            else:
-                print("Opção inválida. Por favor, escolha uma das opções listadas.")
-
-        
-        compras_dict = dict(compras_lista)
-        print(compras_dict)
-        for key, values in compras_dict.items():
-            total += values
-
-        print(f"Valor total da compra R$: {total}")
+        #VENDEDORES
         cursor.execute("SELECT * FROM vendedores_nomes")
-
         vendedores = cursor.fetchall()
 
         if len(vendedores) > 0:
@@ -382,35 +349,86 @@ def comprar_produtos():
         
         vendedor = int(input("Selecione o vendedor que o atendeu: "))
 
-        query = f"""
-        CREATE PROCEDURE conta @a INT, @b INT, @c INT
-        AS
-        BEGIN
-            INSERT INTO compras VALUES (NULL, 
-                                {id_usuario}, 
-                                {vendedor}, 
-                                NULL, );
-            
-            
-            valor_total DECIMAL(10, 2) NOT NULL,
-            forma_pagamento ENUM('cartao', 'boleto', 'pix', 'berries') NOT NULL,
-            status_pagamento ENUM('pendente', 'confirmado') DEFAULT 'pendente',
-        END
-        """
+        # Inserir dados na tabela compras
+        cursor.execute("INSERT INTO compras (idcliente, idvendedor, data_compra, valor_total, forma_pagamento, status_pagamento) VALUES (%s, %s, %s, '0', '1', 'pendente')", (vendedor, id_usuario, data_formatada))
 
-        # Executar a consulta para criar a stored procedure
-        cursor.execute(query)
+        # Confirmar a transação no banco de dados
         conn.commit()
+
+
+        fim = ''
+        while fim != 'N':
+            med = pesquisar()
+            qtde = int(input('Quantas unidades deseja adquirir? '))
+            nome_item = med[1]
+            valor = float(med[-1])
+            print(f'Valor total parcial: {valor}')
+
+            cursor.execute(f"SELECT idcompra FROM compras WHERE idcliente = '{id_usuario}' AND idvendedor = '{vendedor}';")
+
+            cursor.execute("SELECT MAX(idcompra) AS ultimo_id FROM compras")
+            id_da_compra = cursor.fetchone()  # Ajuste aqui para usar fetchone() em vez de fetchall()
+            
+            
+            if id_da_compra:  # Verifica se a consulta retornou algum resultado
+                id_da_compra = id_da_compra[0]  # Acessa o primeiro valor da tupla retornada
+                
+                # Inserir os dados na tabela itens_compra
+                cursor.execute("INSERT INTO itens_compra (iditem, idcompra, nome_item, quantidade, preco_unitario) VALUES (NULL, %s, %s, %s, %s)", (id_da_compra, nome_item, qtde, valor))
+                print("Item inserido com sucesso!")
+
+            else:
+                print("Nenhuma compra encontrada para o cliente e vendedor especificados.")
+
+            fim = str(input('Deseja realizar outra compra? [S/N]: ')).upper()
+            
+        # Confirmar a transação no banco de dados
+        conn.commit()
+
+
+
+        # Executar a consulta SQL
+        cursor.execute("SELECT MAX(idcompra) AS ultimo_id FROM compras")
+
+        # Obter o resultado da consulta
+        resultado = cursor.fetchone()
+
+        # Verificar se há resultados
+        if resultado[0] is not None:
+            ultimo_id = resultado[0]
+            print(f"O último ID registrado na tabela compras é: {ultimo_id}")
+
+            pgmto = ['cartao', 'boleto', 'pix', 'berries']
+                          
+            while True:
+                ask = int(input("Qual a forma de pagamento?\n"
+                                "1 - cartao\n"
+                                "2 - boleto\n"
+                                "3 - pix\n"
+                                "4 - berries\n"))
+
+                if ask in [1, 2, 3, 4]:
+                    pgmto_tipo = pgmto[ask - 1]
+                    
+                    # Verifica se pgmto_tipo está entre os valores válidos
+                    if pgmto_tipo not in pgmto:
+                        print("Opção de pagamento inválida.")
+                        continue
+
+                    sql_update = f"UPDATE compras SET forma_pagamento = '{pgmto_tipo}' WHERE idcompra = {ultimo_id};"
+                    cursor.execute(sql_update)
+                    conn.commit()
+                    break
+        else:
+            print("Nenhum registro encontrado na tabela compras.")
+
+
+        
+    else:
+            print('Usuário ou senha incorretos.')
         
 
-            
-        '''ask = int(input('Qual medicamento deseja adquirir? [id]: '))
-        cursor.execute(f"SELECT id, nome FROM medicamentos WHERE id = '{ask}'")
-        results = cursor.fetchall()
-        for row in results:
-            print(row)'''
-    else:
-        print('Usuário ou senha incorretos.')
+    conn.commit()
     
 
 def menu():

@@ -108,8 +108,8 @@ CREATE TABLE compras (
     idvendedor INT NOT NULL,
     data_compra TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     valor_total DECIMAL(10, 2) NOT NULL,
-    forma_pagamento ENUM('cartao', 'boleto', 'pix', 'berries') NOT NULL,
-    status_pagamento ENUM('pendente', 'confirmado') DEFAULT 'pendente',
+    forma_pagamento varchar(20)  NOT NULL,
+    status_pagamento varchar(20)  DEFAULT 'pendente',
     FOREIGN KEY (idcliente) REFERENCES clientes(idcliente),
     FOREIGN KEY (idvendedor) REFERENCES vendedores(idvendedor)
 );
