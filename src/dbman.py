@@ -55,7 +55,8 @@ class DataProvider:
         self.open()
         cursor = self.conn.cursor()
 
-        cursor.execute(f"INSERT INTO medicamentos (id, nome, categoria_regulatoria, data_vencimento_registro, classe_terapeutica, situacao_registro, principio_ativo, preco) VALUES (NULL, '{nome}', '{categoria}', '{vencimento}', '{classe}', '{situacao}', '{principio}', {float(preco)})")
+        cursor.execute("INSERT INTO medicamentos (id, nome, categoria_regulatoria, data_vencimento_registro, classe_terapeutica, situacao_registro, principio_ativo, preco) VALUES (NULL, %s, %s, %s, %s, %s, %s, %s)",
+                       (nome, categoria, vencimento, classe, situacao, principio, float(preco)))
         self.conn.commit()
 
         self.close()
@@ -64,7 +65,8 @@ class DataProvider:
         self.open()
         cursor = self.conn.cursor()
 
-        cursor.execute(f"UPDATE medicamentos SET nome='{nome}', categoria_regulatoria='{categoria}', data_vencimento_registro='{vencimento}', classe_terapeutica='{classe}', situacao_registro='{situacao}', principio_ativo='{principio}', preco='{ float(preco) }' WHERE id='{id}'")
+        cursor.execute("UPDATE medicamentos SET nome=%s, categoria_regulatoria=%s, data_vencimento_registro=%s, classe_terapeutica=%s, situacao_registro=%s, principio_ativo=%s, preco=%s WHERE id=%s",
+                       (nome, categoria, vencimento, classe, situacao, principio, float(preco), id))
         self.conn.commit()
 
         self.close()
@@ -73,7 +75,7 @@ class DataProvider:
         self.open()
         cursor  = self.conn.cursor()
 
-        cursor.execute(f"DELETE FROM medicamentos WHERE id={id}")
+        cursor.execute("DELETE FROM medicamentos WHERE id=%s", (id,))
 
         self.conn.commit()
 
@@ -140,70 +142,3 @@ class DataProvider:
 
         return log
 
-
-
-# def pesquisar():
-#     """
-#     Função para pesquisar um produto
-#     """  
-    
-#     open()
-#     cursor = self.conn.cursor()
-
-#     ask = int(input('Deseja realizar a pesquisa pelo (1-nome) ou (2-id): '))
-
-#     if ask == 1:
-#         nome = str(input('Informe o nome do medicamento: '))
-#         cursor.execute(f"SELECT * FROM medicamentos WHERE nome='{nome}'")
-#         produto = cursor.fetchone()
-#         if produto:
-#             print("--------------------")
-#             print(f"Nome: {produto[1]}")
-#             print("--------------------")
-#             print(f"ID: {produto[0]}")
-#             print(f"Categoria: {produto[2]}")
-#             print(f"Vencimento: {produto[3]}")
-#             print(f"Classe Terapêutica: {produto[4]}")
-#             print(f"Situação: {produto[5]}")
-#             print(f"Princípio Ativo: {produto[6]}")
-#             print(f"Valor: R$ {produto[7]}")
-#             print("--------------------")
-#         else:
-#             print("Medicamento não encontrado")
-#     elif ask == 2:
-#         aid = int(input('Informe o id do medicamento: '))
-#         cursor.execute(f"SELECT * FROM medicamentos WHERE id={aid}")
-#         produto = cursor.fetchone()
-#         if produto:
-#             print("--------------------")
-#             print(f"ID: {produto[0]}")
-#             print("--------------------")
-#             print(f"Nome: {produto[1]}")
-#             print(f"Categoria: {produto[2]}")
-#             print(f"Vencimento: {produto[3]}")
-#             print(f"Classe Terapêutica: {produto[4]}")
-#             print(f"Situação: {produto[5]}")
-#             print(f"Princípio Ativo: {produto[6]}")
-#             print(f"Valor: R$ {produto[7]}")
-#             print("--------------------")
-#         else:
-#             print("Medicamento não encontrado")
-#     else:
-#         print("Opção inválida")
-
-#     # Verifica se a consulta retornou algum resultado
-#     results = cursor.fetchall()
-#     '''if results:
-#         for row in results:
-#             print(row)
-#     else:
-#         print("Nenhum resultado encontrado.")'''
-
-#     self.conn.commit()
-
-#     if cursor.rowcount == 1:
-#         print(f'O produto foi exibido com sucesso')
-#     else:
-#         print(f'Produto {nome} não consta na base de dados')
-
-#     self.close()
