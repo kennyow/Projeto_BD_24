@@ -363,7 +363,6 @@ def comprar_produtos():
             qtde = int(input('Quantas unidades deseja adquirir? '))
             nome_item = med[1]
             valor = float(med[-1])
-            print(f'Valor total parcial: {valor}')
 
             cursor.execute(f"SELECT idcompra FROM compras WHERE idcliente = '{id_usuario}' AND idvendedor = '{vendedor}';")
 
@@ -385,7 +384,6 @@ def comprar_produtos():
             
         # Confirmar a transação no banco de dados
         conn.commit()
-
 
 
         # Executar a consulta SQL
@@ -423,13 +421,29 @@ def comprar_produtos():
         else:
             print("Nenhum registro encontrado na tabela compras.")
 
+        print('Conferindo as Compras:')
 
-        
-    else:
+
+        #SOMA
+        cursor.execute("SELECT SUM(quantidade * preco_unitario) AS total FROM itens_compra WHERE idcompra = %s", (ultimo_id,))
+
+        # Obter o resultado da consulta
+        resultado = cursor.fetchone()
+
+        # Verificar se há resultados
+        if resultado[0] is not None:
+            soma = resultado[0]
+            print(f"A soma dos resultados é: {soma}")
+            print(f"último id é: {ultimo_id}")
+            #INSERINDO TOTAL
+            cursor.execute(f"UPDATE compras SET valor_total= '{soma}' WHERE idcompra = {ultimo_id};")
+            conn.commit()
+        else:
             print('Usuário ou senha incorretos.')
-        
 
-    conn.commit()
+
+
+            
     
 
 def menu():
