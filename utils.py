@@ -46,9 +46,10 @@ def listar():
             print(f"ID: {produto[0]}")
             print(f"Produto: {produto[1]}")
             print(f"Categoria: {produto[3]}")
-            print(f"Classe Terapêutica: {produto[5]}")
-            print(f"Vencimento: {produto[4]}")
-            print(f"Valor: R$ {produto[7]}")
+            print(f"Classe Terapêutica: {produto[4]}")
+            print(f"Mari: {produto[5]}")
+            print(f"Vencimento: {produto[7]}")
+            print(f"Valor: R$ {produto[9]}")
             print("--------------------")
     else:
         print("Não existem medicamentos cadastrados")
@@ -96,14 +97,14 @@ def atualizar():
     categoria = input('Informe a categoria: ')
     vencimento = input('Informe a data de vencimento (Ex: 21-12-2): ')
     classe = input('Informe a classe terapêutica: ')
-    situacao = input('Informe se é de Mari [S/N]: ').upper()
+    mari = input('Informe se é de Mari [S/N]: ').upper()
     situacao = input('Informe a situação de registro: ')
     principio = input('Informe o principio ativo: ')
     estoque = int(input('Informe o estoque: '))
     preco = float(input('Informe o preço: ')) 
 
    
-    cursor.execute(f"UPDATE medicamentos SET nome='{nome}', categoria_regulatoria='{categoria}', data_vencimento_registro='{vencimento}', classe_terapeutica='{classe}', situacao_registro='{situacao}', principio_ativo='{principio}', estoque='{estoque}', preco={preco} WHERE id='{codigo}'")
+    cursor.execute(f"UPDATE medicamentos SET nome='{nome}', categoria_regulatoria='{categoria}', data_vencimento_registro='{vencimento}', classe_terapeutica='{classe}', mari = '{mari}', situacao_registro='{situacao}', principio_ativo='{principio}', estoque='{estoque}', preco={preco} WHERE id='{codigo}'")
 
 
     conn.commit()
@@ -362,7 +363,11 @@ def comprar_produtos():
             qtde = int(input('Quantas unidades deseja adquirir? '))
             nome_item = med[1]
             valor = float(med[-1])
+            estoque = int(med[-2])
 
+            while qtde > estoque:
+                qtde = int(input('Insira novamente uma quantidade compatível com o estoque: '))
+                
             cursor.execute(f"SELECT idcompra FROM compras WHERE idcliente = '{id_usuario}' AND idvendedor = '{vendedor}';")
 
             cursor.execute("SELECT MAX(idcompra) AS ultimo_id FROM compras")
@@ -439,9 +444,9 @@ def comprar_produtos():
 
             print('PROCURANDO DESCONTOS: ')
 
-                    # Executar a stored procedure para aplicar o desconto
+            # Executar a stored procedure para aplicar o desconto
             cursor.execute("CALL AplicarDesconto();")
-
+            conn.commit()
             # Obter os valores atualizados da tabela compras após o desconto para uma compra específica
        
             cursor.execute("SELECT idcompra, idcliente, valor_total FROM compras WHERE idcompra = %s", (ultimo_id,))
@@ -449,6 +454,7 @@ def comprar_produtos():
 
             # Verificar se a compra foi encontrada e imprimir os detalhes
             if compra_atualizada:
+                print("--------------------")
                 print("RECIBO:")
                 print("--------------------")
                 print(f"ID Compra: {compra_atualizada[0]}")
@@ -456,7 +462,7 @@ def comprar_produtos():
                 print(f"Valor Total Atualizado: {compra_atualizada[2]}")
                 print("--------------------")
             else:
-                print(f"Compra com ID {id_compra} não encontrada ou não foi atualizada")
+                print(f"Compra com ID {ultimo_id} não encontrada ou não foi atualizada")
 
 
 
