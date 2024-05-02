@@ -43,9 +43,10 @@ class DataProvider:
             medicine_list[-1]['category'] = produto[2]
             medicine_list[-1]['limit_date'] = produto[3]
             medicine_list[-1]['therapeutic_class'] = produto[4]
-            medicine_list[-1]['status'] = produto[5]
-            medicine_list[-1]['active'] = produto[6]
-            medicine_list[-1]['price'] = produto[7]
+            medicine_list[-1]['status'] = produto[6]
+            medicine_list[-1]['active'] = produto[7]
+            medicine_list[-1]['stock'] = produto[8]
+            medicine_list[-1]['price'] = produto[9]
 
         self.close()
 
@@ -55,7 +56,8 @@ class DataProvider:
         self.open()
         cursor = self.conn.cursor()
 
-        cursor.execute(f"INSERT INTO medicamentos (id, nome, categoria_regulatoria, data_vencimento_registro, classe_terapeutica, situacao_registro, principio_ativo, preco) VALUES (NULL, '{nome}', '{categoria}', '{vencimento}', '{classe}', '{situacao}', '{principio}', {float(preco)})")
+        cursor.execute("INSERT INTO medicamentos (id, nome, categoria_regulatoria, data_vencimento_registro, classe_terapeutica, situacao_registro, principio_ativo, preco) VALUES (NULL, %s, %s, %s, %s, %s, %s, %s)",
+                       (nome, categoria, vencimento, classe, situacao, principio, float(preco)))
         self.conn.commit()
 
         self.close()
@@ -64,7 +66,8 @@ class DataProvider:
         self.open()
         cursor = self.conn.cursor()
 
-        cursor.execute(f"UPDATE medicamentos SET nome='{nome}', categoria_regulatoria='{categoria}', data_vencimento_registro='{vencimento}', classe_terapeutica='{classe}', situacao_registro='{situacao}', principio_ativo='{principio}', preco='{ float(preco) }' WHERE id='{id}'")
+        cursor.execute("UPDATE medicamentos SET nome=%s, categoria_regulatoria=%s, data_vencimento_registro=%s, classe_terapeutica=%s, situacao_registro=%s, principio_ativo=%s, preco=%s WHERE id=%s",
+                       (nome, categoria, vencimento, classe, situacao, principio, float(preco), id))
         self.conn.commit()
 
         self.close()
@@ -73,7 +76,7 @@ class DataProvider:
         self.open()
         cursor  = self.conn.cursor()
 
-        cursor.execute(f"DELETE FROM medicamentos WHERE id={id}")
+        cursor.execute("DELETE FROM medicamentos WHERE id=%s", (id,))
 
         self.conn.commit()
 
@@ -139,71 +142,97 @@ class DataProvider:
         self.close()
 
         return log
-
-
-
-# def pesquisar():
-#     """
-#     Função para pesquisar um produto
-#     """  
     
-#     open()
-#     cursor = self.conn.cursor()
+    def login(self, uname, pwd):
+        self.open()
+        cursor = self.conn.cursor()
 
-#     ask = int(input('Deseja realizar a pesquisa pelo (1-nome) ou (2-id): '))
+        cursor.execute("SELECT * FROM clientes WHERE usuario=%s AND senha =%s",
+                       (uname, pwd))
+        
+        result = cursor.fetchone()
 
-#     if ask == 1:
-#         nome = str(input('Informe o nome do medicamento: '))
-#         cursor.execute(f"SELECT * FROM medicamentos WHERE nome='{nome}'")
-#         produto = cursor.fetchone()
-#         if produto:
-#             print("--------------------")
-#             print(f"Nome: {produto[1]}")
-#             print("--------------------")
-#             print(f"ID: {produto[0]}")
-#             print(f"Categoria: {produto[2]}")
-#             print(f"Vencimento: {produto[3]}")
-#             print(f"Classe Terapêutica: {produto[4]}")
-#             print(f"Situação: {produto[5]}")
-#             print(f"Princípio Ativo: {produto[6]}")
-#             print(f"Valor: R$ {produto[7]}")
-#             print("--------------------")
-#         else:
-#             print("Medicamento não encontrado")
-#     elif ask == 2:
-#         aid = int(input('Informe o id do medicamento: '))
-#         cursor.execute(f"SELECT * FROM medicamentos WHERE id={aid}")
-#         produto = cursor.fetchone()
-#         if produto:
-#             print("--------------------")
-#             print(f"ID: {produto[0]}")
-#             print("--------------------")
-#             print(f"Nome: {produto[1]}")
-#             print(f"Categoria: {produto[2]}")
-#             print(f"Vencimento: {produto[3]}")
-#             print(f"Classe Terapêutica: {produto[4]}")
-#             print(f"Situação: {produto[5]}")
-#             print(f"Princípio Ativo: {produto[6]}")
-#             print(f"Valor: R$ {produto[7]}")
-#             print("--------------------")
-#         else:
-#             print("Medicamento não encontrado")
-#     else:
-#         print("Opção inválida")
+        #self.conn.commit()
 
-#     # Verifica se a consulta retornou algum resultado
-#     results = cursor.fetchall()
-#     '''if results:
+        self.close()
+
+        return result
+
+# def comprar_produtos():
+#     if welcome == 1:
+#         print("Login efetuado com sucesso!")
+#         id_usuario = cursor.execute(f"SELECT idcliente FROM clientes WHERE usuario= '{login}' AND senha = '{senha}'")
+#         fim = ''
+#         compras_lista = []  
+
+#         while fim != 'N':
+#             med = pesquisar()
+#             qtde = int(input('Quantas unidades deseja adquirir? '))
+#             print(f'Encontrados: {med}')
+#             chave = med[0]
+#             valor = float(med[-1] * qtde)
+#             print(f'Valor total parcial: {valor}')
+#             compras_lista.append((chave, valor))  
+#             fim = input('Deseja realizar uma nova compra? [S/N]').strip().upper()
+        
+#         while True:
+#             pgmt = int(input("Qual a forma de pagamento?\n"
+#                             "1 - Cart�o\n"
+#                             "2 - Boleto\n"
+#                             "3 - Pix\n"
+#                             "4 - Berries\n"))
+
+#             if pgmt in [1, 2, 3, 4]:
+#                 break
+#             else:
+#                 print("Op��o inv�lida. Por favor, escolha uma das op��es listadas.")
+
+        
+#         compras_dict = dict(compras_lista)
+#         print(compras_dict)
+#         for key, values in compras_dict.items():
+#             total += values
+
+#         print(f"Valor total da compra R$: {total}")
+#         cursor.execute("SELECT * FROM vendedores_nomes")
+
+#         vendedores = cursor.fetchall()
+
+#         if len(vendedores) > 0:
+#             print("Listando Vendedores")
+#             print("--------------------")
+#             for vendedor in vendedores:
+#                 print(f"ID: {vendedor[0]} || Nome: {vendedor[1]}")
+#                 print("--------------------")
+        
+#         vendedor = int(input("Selecione o vendedor que o atendeu: "))
+
+#         query = f"""
+#         CREATE PROCEDURE conta @a INT, @b INT, @c INT
+#         AS
+#         BEGIN
+#             INSERT INTO compras VALUES (NULL, 
+#                                 {id_usuario}, 
+#                                 {vendedor}, 
+#                                 NULL, );
+            
+            
+#             valor_total DECIMAL(10, 2) NOT NULL,
+#             forma_pagamento ENUM('cartao', 'boleto', 'pix', 'berries') NOT NULL,
+#             status_pagamento ENUM('pendente', 'confirmado') DEFAULT 'pendente',
+#         END
+#         """
+
+#         # Executar a consulta para criar a stored procedure
+#         cursor.execute(query)
+#         conn.commit()
+        
+
+            
+#         '''ask = int(input('Qual medicamento deseja adquirir? [id]: '))
+#         cursor.execute(f"SELECT id, nome FROM medicamentos WHERE id = '{ask}'")
+#         results = cursor.fetchall()
 #         for row in results:
-#             print(row)
+#             print(row)'''
 #     else:
-#         print("Nenhum resultado encontrado.")'''
-
-#     self.conn.commit()
-
-#     if cursor.rowcount == 1:
-#         print(f'O produto foi exibido com sucesso')
-#     else:
-#         print(f'Produto {nome} não consta na base de dados')
-
-#     self.close()
+#         print('Usu�rio ou senha incorretos.')

@@ -334,6 +334,7 @@ def comprar_produtos():
     if resultado:
         id_usuario = resultado[0]
         print(f'ID DO USUÁRIO: {id_usuario}')
+
         print("Login efetuado com sucesso!")
 
         #VENDEDORES
