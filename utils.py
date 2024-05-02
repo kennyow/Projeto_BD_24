@@ -334,7 +334,6 @@ def comprar_produtos():
     if resultado:
         id_usuario = resultado[0]
         print(f'ID DO USUÁRIO: {id_usuario}')
-
         print("Login efetuado com sucesso!")
 
         #VENDEDORES
@@ -348,10 +347,10 @@ def comprar_produtos():
                 print(f"ID: {vendedor[0]} || Nome: {vendedor[1]}")
                 print("--------------------")
         
-        vendedor = int(input("Selecione o vendedor que o atendeu: "))
+        vendedor = int(input("Selecione o vendedor que o atendeu[id]: "))
 
         # Inserir dados na tabela compras
-        cursor.execute("INSERT INTO compras (idcliente, idvendedor, data_compra, valor_total, forma_pagamento, status_pagamento) VALUES (%s, %s, %s, '0', '1', 'pendente')", (vendedor, id_usuario, data_formatada))
+        cursor.execute(f"INSERT INTO compras (idcliente, idvendedor, data_compra, valor_total, forma_pagamento, status_pagamento) VALUES ('{id_usuario}', '{vendedor}', '{data_formatada}', '0',  'pendente' , '1')")
 
         # Confirmar a transação no banco de dados
         conn.commit()
@@ -442,9 +441,6 @@ def comprar_produtos():
             print('Usuário ou senha incorretos.')
 
 
-
-            
-    
 
 def menu():
     """
