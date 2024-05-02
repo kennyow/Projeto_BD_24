@@ -432,13 +432,39 @@ def comprar_produtos():
         # Verificar se há resultados
         if resultado[0] is not None:
             soma = resultado[0]
-            print(f"A soma dos resultados é: {soma}")
-            print(f"último id é: {ultimo_id}")
+    
             #INSERINDO TOTAL
             cursor.execute(f"UPDATE compras SET valor_total= '{soma}' WHERE idcompra = {ultimo_id};")
             conn.commit()
-        else:
-            print('Usuário ou senha incorretos.')
+
+            print('PROCURANDO DESCONTOS: ')
+
+                    # Executar a stored procedure para aplicar o desconto
+            cursor.execute("CALL AplicarDesconto();")
+
+            # Obter os valores atualizados da tabela compras após o desconto para uma compra específica
+       
+            cursor.execute("SELECT idcompra, idcliente, valor_total FROM compras WHERE idcompra = %s", (ultimo_id,))
+            compra_atualizada = cursor.fetchone()
+
+            # Verificar se a compra foi encontrada e imprimir os detalhes
+            if compra_atualizada:
+                print("RECIBO:")
+                print("--------------------")
+                print(f"ID Compra: {compra_atualizada[0]}")
+                print(f"ID Cliente: {compra_atualizada[1]}")
+                print(f"Valor Total Atualizado: {compra_atualizada[2]}")
+                print("--------------------")
+            else:
+                print(f"Compra com ID {id_compra} não encontrada ou não foi atualizada")
+
+
+
+    else:
+        print('Usuário ou senha incorretos.')
+
+
+        
 
 
 
