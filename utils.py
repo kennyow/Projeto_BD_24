@@ -351,7 +351,7 @@ def comprar_produtos():
         vendedor = int(input("Selecione o vendedor que o atendeu[id]: "))
 
         # Inserir dados na tabela compras
-        cursor.execute(f"INSERT INTO compras (idcliente, idvendedor, data_compra, valor_total, forma_pagamento, status_pagamento) VALUES ('{id_usuario}', '{vendedor}', '{data_formatada}', '0',  'pendente' , '1')")
+        cursor.execute(f"INSERT INTO compras (idcliente, idvendedor, data_compra, valor_total, forma_pagamento, status_pagamento) VALUES ('{id_usuario}', '{vendedor}', '{data_formatada}', '0',  '0' , 'pendente')")
 
         # Confirmar a transação no banco de dados
         conn.commit()
@@ -443,13 +443,31 @@ def comprar_produtos():
             conn.commit()
 
             print('PROCURANDO DESCONTOS: ')
+            print(f'Id usuário: {id_usuario}')
+
+
+            cursor.execute(f"SELECT isflamengo, isonepiece, issousa FROM clientes WHERE idcliente = {id_usuario};")
+            compra_atualizada = cursor.fetchone()
+            print(f'COMPRA: {compra_atualizada}')
+            flamengo = compra_atualizada[-3]
+            onepiece = compra_atualizada[-2]
+            sousa = compra_atualizada[-1]
+            id_compra = ultimo_id
+            id_cliente = id_usuario
+
 
             # Executar a stored procedure para aplicar o desconto
-            cursor.execute("CALL AplicarDesconto();")
+            # Executar a stored procedure
+            cursor.execute("CALL AplicarDescontoUltimaCompra(%s, %s);", (id_compra, id_cliente))
+
+            # Certificar-se de que todos os resultados da stored procedure foram processados
+            cursor.nextset()
+
+            # Comitar as alterações no banco de dados
             conn.commit()
             # Obter os valores atualizados da tabela compras após o desconto para uma compra específica
        
-            cursor.execute("SELECT idcompra, idcliente, valor_total FROM compras WHERE idcompra = %s", (ultimo_id,))
+            cursor.execute("SELECT idcompra, idcliente, valor_total FROM compras WHERE idcompra = %s;", (ultimo_id,))
             compra_atualizada = cursor.fetchone()
 
             # Verificar se a compra foi encontrada e imprimir os detalhes
@@ -464,7 +482,15 @@ def comprar_produtos():
             else:
                 print(f"Compra com ID {ultimo_id} não encontrada ou não foi atualizada")
 
+            pagamento = str(input('Deseja realizar pagamento?[S/N]:' )).upper()
 
+            if pagamento == 'S':
+                #INSERINDO TOTAL
+                cursor.execute(f"UPDATE compras SET status_pagamento = 'confirmado' WHERE idcompra = {ultimo_id};")
+                conn.commit()
+                print('Pagamento confirmado. Volte Sempre.')
+            else:
+                print('Compra cancelada.')
 
     else:
         print('Usuário ou senha incorretos.')
